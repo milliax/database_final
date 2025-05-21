@@ -25,15 +25,14 @@ model User {
     // account for a user signable
     id String @id @default(cuid())
 
-    username String  @unique
-    password String?
+    // username String  @unique
+    email    String  @unique
+    password String
 
     name    String?
     phone   String?
     address String?
-    token   String? @default(uuid())
 
-    email         String?
     emailVerified DateTime?
     image         String?
     sessions      Session[]
