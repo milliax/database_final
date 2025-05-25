@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Button from "@/components/button";
 
 export default function Home() {
     return (
@@ -15,12 +16,13 @@ export default function Home() {
             </div>
             
             <div className="flex flex-col items-center justify-center">
-                <p className="text-lg">This is the main content area.</p>
+                <p className="text-lg">Hello.</p>
             </div>
 
             <footer className="text-sm text-gray-500">
                 &copy; 2023 Your Company Name
             </footer>
+            <Button />
         </div>
     );
 }
