@@ -23,8 +23,13 @@ enum Role {
 
 enum ConsultationStatus {
     PENDING
+
+    CHECKED_IN
+
     IN_PROGRESS
     COMPLETED
+
+    NO_SHOW
 
     CANCELLED
 }
@@ -96,8 +101,22 @@ model Doctor {
 
     createdAt    DateTime    @default(now())
     updatedAt    DateTime    @updatedAt
-    Department   Department? @relation(fields: [departmentId], references: [id])
+    department   Department? @relation(fields: [departmentId], references: [id])
     departmentId String?
+}
+
+model Schedule { // 一個禮拜一個 schedule
+    id String @id @default(cuid())
+
+    doctorId String
+    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+    // custom fields below
+    startTime DateTime // start time of the schedule
+    slots Int[] // number of slots available for the day
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Consultation {
@@ -114,8 +133,7 @@ model Consultation {
     prescription String?
     status       ConsultationStatus? @default(PENDING)
 
-    rating   Int?
-    feedback String?
+    feedback Feedback[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -131,22 +149,8 @@ model Appointment {
     patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
     // custom fields below
-    slot Int // from 0 to 20
-    feedback  Feedback[]
+    slot   Int // from 0 to 20
     status String? @default("PENDING")
-
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
-}
-
-model Schedule {
-    id String @id @default(cuid())
-
-    doctorId String
-    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-
-    // custom fields below
-    slots Int[] // number of slots available for the day
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -155,8 +159,11 @@ model Schedule {
 model Feedback {
     id String @id @default(cuid())
 
-    appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-    appointmentId String
+    consultation   Consultation? @relation(fields: [consultationId], references: [id])
+    consultationId String?
+
+    rating         Int?
+    comment        String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

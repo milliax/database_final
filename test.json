@@ -1,0 +1,58 @@
+[
+    {
+        "id": "cmaxqicr100017kcpyntgtz4l",
+        "email": "doctor@admin.com",
+        "password": "$2b$10$g5g.B9hPHQAvW/xAzh1SmevlVHFSHbKYmB8j5ninikbvg5b.vTwEq",
+        "name": "醫生",
+        "phone": null,
+        "address": null,
+        "emailVerified": null,
+        "image": null,
+        "createdAt": "2025-05-21T09:22:23.629Z",
+        "updatedAt": "2025-05-21T09:23:51.917Z",
+        "role": "DOCTOR",
+        "sessions": []
+    },
+    {
+        "id": "cmaxqk91000027kl1148ywsgk",
+        "email": "doc@admin.com",
+        "password": "$2b$10$g5g.B9hPHQAvW/xAzh1SmevlVHFSHbKYmB8j5ninikbvg5b.vTwEq",
+        "name": "醫者",
+        "phone": null,
+        "address": null,
+        "emailVerified": null,
+        "image": null,
+        "createdAt": "2025-05-21T09:23:52.116Z",
+        "updatedAt": "2025-05-21T09:23:52.116Z",
+        "role": "DOCTOR",
+        "sessions": []
+    },
+    {
+        "id": "cmaxqk96i00037kl1z3gztapi",
+        "email": "patient@admin.com",
+        "password": "$2b$10$g5g.B9hPHQAvW/xAzh1SmevlVHFSHbKYmB8j5ninikbvg5b.vTwEq",
+        "name": "邱志揚",
+        "phone": null,
+        "address": null,
+        "emailVerified": null,
+        "image": null,
+        "createdAt": "2025-05-21T09:23:52.315Z",
+        "updatedAt": "2025-05-21T09:23:52.315Z",
+        "role": "PATIENT",
+        "sessions": []
+    },
+    {
+        "id": "cmaxqicld00007kcpxp67e0nb",
+        "email": "admin@admin.com",
+        "password": "$2b$10$g5g.B9hPHQAvW/xAzh1SmevlVHFSHbKYmB8j5ninikbvg5b.vTwEq",
+        "name": "Updated User Name",
+        "phone": null,
+        "address": null,
+        "emailVerified": null,
+        "image": null,
+        "createdAt": "2025-05-21T09:22:23.425Z",
+        "updatedAt": "2025-05-25T07:37:17.696Z",
+        "role": "ADMIN",
+        "sessions": []
+    }
+]
