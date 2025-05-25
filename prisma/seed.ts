@@ -57,19 +57,32 @@ async function main() {
         }
     })
 
+    const patient_password = `${`0${new Date("2000-01-01").getMonth() + 1}`.slice(-2)}${`0${new Date("2000-01-01").getDate()}`.slice(-2)}`
+    const hashedPatientPassword = await bcrypt.hash(patient_password, 10)
+
     const patient = await prisma.user.upsert({
         where: {
-            email: "patient@admin.com"
+            email: "A123456789"
         },
         update: {
-            password: hashedPassword,
+            password: hashedPatientPassword,
             role: "PATIENT",
         },
         create: {
-            email: "patient@admin.com",
+            email: "A123456789",
             name: "邱志揚",
-            password: hashedPassword,
+            password: hashedPatientPassword,
             role: "PATIENT",
+
+            patient: {
+                create: {
+                    id_card_number: "A123456789",
+                    birth_date: new Date("2000-01-01T00:00:00.000Z"),
+                    id_card_issue_date: new Date("2020-01-01T00:00:00.000Z"),
+                    id_card_location: "台北市",
+                    id_card_issue_type: "初發",
+                },
+            },
         }
     })
 

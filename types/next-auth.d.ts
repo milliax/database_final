@@ -6,7 +6,7 @@ import { JWT } from "next-auth/jwt";
 declare module "next-auth" {
     interface User extends UserModel {
         id: string;
-        username: string,
+        email: string,
         role: string
     }
 
@@ -19,7 +19,7 @@ declare module "next-auth" {
 
     interface JWT extends DefaultJWT {
         role: string,
-        username: string
+        email: string
     }
 }
 

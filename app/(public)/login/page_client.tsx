@@ -31,7 +31,7 @@ export default function Login() {
             // console.log(response)
 
             if (!response?.error) {
-                router.push("/")
+                // router.push("/");
                 router.refresh();
                 // router.push("/")
                 // router.refresh()

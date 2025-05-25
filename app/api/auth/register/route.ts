@@ -40,12 +40,12 @@ export const POST = async (req: NextRequest) => {
         }
 
         const birth = new Date(birth_date);
-        const password = `${`0${birth.getMonth() + 1}`.slice(-2)}${`0${birth.getDate()}`.slice(-2)}`
-
-        const hashedPassword = await bcrypt.hash(password, 10);
 
         const accurated_birth_day = addHours(birth, 8); // Adjust for timezone if needed
         const accurated_issue_date = addHours(new Date(issue_date), 8); // Adjust for timezone if needed
+
+        const password = `${`0${accurated_birth_day.getMonth() + 1}`.slice(-2)}${`0${accurated_birth_day.getDate()}`.slice(-2)}`
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await prisma.user.create({
             data: {
@@ -66,6 +66,7 @@ export const POST = async (req: NextRequest) => {
         });
 
         console.log("New user created:", newUser, "with password:", password);
+        console.log("hashedPassword", hashedPassword);
         return NextResponse.json({ message: "註冊成功，請使用身分證字號作為帳號，預設密碼為出生日期的月日（MMDD）" }, { status: 201 });
     } catch (error) {
         console.log("Error creating user:", error);

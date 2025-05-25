@@ -40,6 +40,20 @@ export default function RegisterPage() {
                 const errorData = await res.json();
                 throw new Error(errorData.error || "註冊失敗，請稍後再試");
             }
+
+            // alert("註冊成功，請記住您的密碼為：MMDD（MM為出生月份，DD為出生日期）")
+
+            Swal.fire({
+                icon: 'success',
+                title: '註冊成功',
+                text: `您的身分證 ${type} 已成功註冊，請記住您的密碼為：MMDD（MM為出生月份，DD為出生日期）`,
+                confirmButtonText: '前往登入',
+            }).then(() => {
+                setTimeout(() => {
+                    window.location.href = "/summary"; // Redirect to login page
+                }, 100)
+            })
+
         } catch (error) {
             console.error("註冊失敗:", error);
             Swal.fire({
