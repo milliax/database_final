@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation"
 import { Bounce, toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 
+import Link from "next/link";
+
 // import { createClient } from '@/lib/supabase/client';
 
 import { signIn } from "next-auth/react"
@@ -105,6 +107,11 @@ export default function Login() {
                         </button>
                     }
                 </form>
+            </div>
+
+            <div>
+                <span>還沒有帳號嗎</span>
+                <Link href="/register" className="text-sky-600 hover:text-sky-500">立即註冊</Link>
             </div>
         </main>
     )

@@ -39,7 +39,7 @@ model User {
     id String @id @default(cuid())
 
     // username String  @unique
-    email    String @unique
+    email    String? @unique
     password String
 
     name    String?
@@ -77,7 +77,14 @@ model Patient {
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     // custom fields below
-    bio String?
+
+    birth_date     DateTime
+    bio            String?
+
+    id_card_number String   @unique
+    id_card_issue_date DateTime
+    id_card_location String
+    id_card_image String?
 
     consultations Consultation[]
     appointments  Appointment[]
@@ -105,7 +112,7 @@ model Doctor {
     departmentId String?
 }
 
-model Schedule { // 一個禮拜一個 schedule
+model Schedule {
     id String @id @default(cuid())
 
     doctorId String
@@ -113,7 +120,7 @@ model Schedule { // 一個禮拜一個 schedule
 
     // custom fields below
     startTime DateTime // start time of the schedule
-    slots Int[] // number of slots available for the day
+    slots     Int[] // number of slots available for the day
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -162,8 +169,8 @@ model Feedback {
     consultation   Consultation? @relation(fields: [consultationId], references: [id])
     consultationId String?
 
-    rating         Int?
-    comment        String?
+    rating  Int?
+    comment String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

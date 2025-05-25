@@ -1,0 +1,68 @@
+import { NextResponse, NextRequest } from 'next/server';
+
+import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+
+import bcrypt from 'bcrypt';
+
+export const POST = async (req: NextRequest) => {
+
+    try {
+
+        const input_schema = z.object({
+            name: z.string().min(1, "姓名為必填欄位"),
+            id: z.string().min(1, "身分證字號為必填欄位"),
+            birth_date: z.string().min(1, "出生年月日為必填欄位"),
+            issue_date: z.string().min(1, "發證日期為必填欄位"),
+            location: z.string().min(1, "身分證換證地點為必填欄位"),
+        })
+
+        const body = await req.json();
+        const p = input_schema.safeParse(body);
+
+        if (!p.success) {
+            return NextResponse.json({ error: p.error.errors[0].message }, { status: 400 });
+        }
+
+        const { name, id, birth_date, issue_date, location } = p.data;
+
+        const existingUser = await prisma.patient.findUnique({
+            where: {
+                id_card_number: id
+            },
+        });
+
+        if (existingUser) {
+            return NextResponse.json({ error: "此身分證字號已被註冊" }, { status: 400 });
+        }
+
+        const birth = new Date(birth_date);
+        const password = `${`0${birth.getMonth() + 1}`.slice(-2)}${`0${birth.getDate()}`.slice(-2)}`
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = await prisma.user.create({
+            data: {
+                email: id,
+                password: hashedPassword,
+                name: name,
+                patient: {
+                    create: {
+                        id_card_number: id,
+                        birth_date: birth,
+                        id_card_issue_date: new Date(issue_date),
+                        id_card_location: location,
+                    },
+                },
+
+            },
+        });
+
+        console.log("New user created:", newUser, "with password:", password);
+        return NextResponse.json({ message: "註冊成功，請使用身分證字號作為帳號，預設密碼為出生日期的月日（MMDD）" }, { status: 201 });
+    } catch (error) {
+        console.log("Error creating user:", error);
+        return NextResponse.json({ error: "註冊失敗，請稍後再試" }, { status: 500 });
+    }
+
+}
