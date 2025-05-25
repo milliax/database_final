@@ -30,9 +30,9 @@ export default function RegisterPage() {
 
                     birth_date: birthDay?.toISOString(),
                     issue_date: issueDay?.toISOString(),
+                    issue_type: idType.toString(), // Convert to string for the API
 
                     location: e.currentTarget.location.value,
-                    type: type
                 })
             })
 

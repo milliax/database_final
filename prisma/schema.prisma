@@ -78,12 +78,14 @@ model Patient {
 
     // custom fields below
 
-    birth_date     DateTime
-    bio            String?
+    birth_date DateTime
+    bio        String?
 
-    id_card_number String   @unique
+    id_card_number     String   @unique
     id_card_issue_date DateTime
-    id_card_location String
+    id_card_location   String
+    id_card_issue_type String
+
     id_card_image String?
 
     consultations Consultation[]

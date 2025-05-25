@@ -5,6 +5,8 @@ import { z } from 'zod';
 
 import bcrypt from 'bcrypt';
 
+import { addHours } from 'date-fns';
+
 export const POST = async (req: NextRequest) => {
 
     try {
@@ -15,6 +17,7 @@ export const POST = async (req: NextRequest) => {
             birth_date: z.string().min(1, "出生年月日為必填欄位"),
             issue_date: z.string().min(1, "發證日期為必填欄位"),
             location: z.string().min(1, "身分證換證地點為必填欄位"),
+            issue_type: z.string().min(1, "身分證換證類型為必填欄位"),
         })
 
         const body = await req.json();
@@ -24,7 +27,7 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json({ error: p.error.errors[0].message }, { status: 400 });
         }
 
-        const { name, id, birth_date, issue_date, location } = p.data;
+        const { name, id, birth_date, issue_date, location, issue_type } = p.data;
 
         const existingUser = await prisma.patient.findUnique({
             where: {
@@ -41,6 +44,9 @@ export const POST = async (req: NextRequest) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        const accurated_birth_day = addHours(birth, 8); // Adjust for timezone if needed
+        const accurated_issue_date = addHours(new Date(issue_date), 8); // Adjust for timezone if needed
+
         const newUser = await prisma.user.create({
             data: {
                 email: id,
@@ -49,9 +55,10 @@ export const POST = async (req: NextRequest) => {
                 patient: {
                     create: {
                         id_card_number: id,
-                        birth_date: birth,
-                        id_card_issue_date: new Date(issue_date),
+                        birth_date: accurated_birth_day,
+                        id_card_issue_date: accurated_issue_date,
                         id_card_location: location,
+                        id_card_issue_type: issue_type === "0" ? "初發" : issue_type === "1" ? "補發" : "換發",
                     },
                 },
 
