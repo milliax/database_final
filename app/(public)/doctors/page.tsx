@@ -61,7 +61,7 @@ export default function DoctorSummaryPage() {
                                 <Image src={d.image || "/images/default-doctor.jpg"} alt={d.name} fill className="object-cover" />
                             </div>
                             <div className="flex-1">
-                                <h2 className="text-2xl font-semibold text-green-800">主治醫師：{d.name}（內科部主任）</h2>
+                                <h2 className="text-2xl font-semibold text-green-800">主治醫師：{d.name}</h2>
                                 {result.length > 0 && result.map((a: any[], idx) => (
                                     <div key={idx}>
                                         <h3 className="text-xl py-2 text-black font-semibold">
@@ -80,7 +80,7 @@ export default function DoctorSummaryPage() {
                                 <div className="mt-4">
                                     <a href={`/doctor/${d.id}`} className="text-blue-600 hover:underline">門診時間</a>
                                 </div>
-                                <div className="mt-2 text-sm text-gray-500">資料更新日期: 2025/4/16</div>
+                                <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
                             </div>
                         </div>
                     </div>
