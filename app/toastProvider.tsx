@@ -7,6 +7,8 @@ import { ToastContainer } from "react-toastify"
 import { useEffect } from "react"
 import { usePathname } from "next/navigation"
 
+import { SessionProvider } from "next-auth/react";
+
 export default function ToastProvider({
     children
 }: {
@@ -16,27 +18,29 @@ export default function ToastProvider({
 
     return (
         <React.Fragment>
-            {children}
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
+            <SessionProvider>
+                {children}
+                <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
+            </SessionProvider>
             <Script id="ms-clarity" strategy="afterInteractive">
                 {`
                     (function(c,l,a,r,i,t,y){
                         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                    })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY}");
-                    `}
+                        })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY}");
+                        `}
             </Script>
         </React.Fragment>
     )

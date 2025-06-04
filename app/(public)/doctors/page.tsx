@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function DoctorSummaryPage() {
     const [doctorData, setDoctorData] = useState<any[]>([]);
@@ -38,9 +39,9 @@ export default function DoctorSummaryPage() {
                             <div className="flex-1">
                                 <h2 className="text-2xl font-semibold text-green-800">主治醫師：{d.name}（內科部主任）</h2>
                                 <div className="mt-4">
-                                    <a href="/doctor" className="text-blue-600 hover:underline">門診時間</a>
+                                    <Link href="/doctor" className="text-blue-600 hover:underline">門診時間</Link>
                                 </div>
-                                <div className="mt-2 text-sm text-gray-500">資料更新日期: 2025/4/16</div>
+                                <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
                             </div>
                         </div>
                     </div>
@@ -78,7 +79,7 @@ export default function DoctorSummaryPage() {
                                     </div>
                                 ))}
                                 <div className="mt-4">
-                                    <a href={`/doctor/${d.id}`} className="text-blue-600 hover:underline">門診時間</a>
+                                    <Link href={`/doctor/${d.id}`} className="text-blue-600 hover:underline">門診時間</Link>
                                 </div>
                                 <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
                             </div>

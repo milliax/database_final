@@ -73,7 +73,7 @@ export default function Login() {
 
     return (
         <main className="flex flex-col justify-center items-center w-screen h-[calc(100vh-5rem)] space-y-5">
-            <div className="text-xl font-bold">小診所</div>
+            <div className="text-xl font-bold">邱綜合醫院</div>
             <div className="border rounded-md shadow-lg">
                 <form onSubmit={async (event) => {
                     event.preventDefault();

@@ -108,8 +108,8 @@ export default function RegisterPage() {
                 </div>
                 <div className="flex flex-col gap-3">
                     <label className="w-32">身分證換證地點</label>
-                    <select className="outline py-1 rounded-md" name="location" required>
-                        <option value="" disabled selected>請選擇縣市</option>
+                    <select className="outline py-1 rounded-md" name="location" required defaultValue="none">
+                        <option value="none" disabled>請選擇縣市</option>
                         <option value="北市">北市</option>
                         <option value="北縣">北縣</option>
                         <option value="新北市">新北市</option>
