@@ -1,0 +1,13 @@
+###
+GET http://localhost:3000/api/v1/health?params=example&query=string
+Accept: application/json
+
+
+###
+POST http://localhost:3000/api/v1/health
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "ok"
+}

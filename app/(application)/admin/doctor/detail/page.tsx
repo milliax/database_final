@@ -204,7 +204,7 @@ const EditScheduleForm = ({
             setSchedule(data);
         } else {
             // maping schedule to default values 0
-            const empty_schedule = Array(21).fill(false);
+            const empty_schedule = Array(21).fill(0);
             console.log("No schedule found, using default values");
             setSchedule(empty_schedule);
         }
