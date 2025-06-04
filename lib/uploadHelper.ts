@@ -10,7 +10,7 @@ export async function uploadImageToSupabase(file: File) {
         const formData = new FormData();
 
         formData.append("images", file);
-        formData.append("bucket", "post-images");
+        formData.append("bucket", "doctor-images");
         formData.append("name", fileName);
 
         const response = await fetch("/api/image/upload", {

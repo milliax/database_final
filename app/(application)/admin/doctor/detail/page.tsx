@@ -6,6 +6,7 @@ import TextareaAutosize from "react-textarea-autosize"
 import clsx from "clsx";
 
 import { numberInLetter } from "@/lib/utils";
+import { uploadImageToSupabase } from '@/lib/uploadHelper';
 
 export default function AdminSchedulePage() {
     const [doctor, setDoctor] = useState<any[]>([]);
@@ -328,15 +329,72 @@ const EditPhoto = ({
 }: {
     doctorId: string
 }) => {
-    if(!doctorId) {
+    const [imageBlob, setImageBlob] = useState<string | null>(null);
+
+    if (!doctorId) {
         return <></>
+    }
+
+    const attachImages = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+
+        if (!files) return;
+
+        const imageBlob = URL.createObjectURL(files[0]);
+
+        setImageBlob(imageBlob);
+
+        // start upload the image to the server
+        const p = await uploadImageToSupabase(files[0]);
+
+        console.log(p)
+
+        const res = await fetch(`/api/admin/doctor/image`, {
+            method: "POST",
+            body: JSON.stringify({
+                doctorId,
+                imageURL: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${p.url}`,
+            })
+        })
+
+        if(!res.ok){
+            Swal.fire({
+                icon: 'error',
+                title: '上傳失敗',
+                text: '請稍後再試',
+            });
+            throw new Error('Failed to upload image');
+        }
+        Swal.fire({
+            icon: 'success',
+            title: '上傳成功',
+            text: '醫生照片已成功上傳',
+        });
     }
 
     return (
         <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
             <h2 className="text-lg font-semibold mb-4">編輯醫生照片</h2>
             <p className="text-sm text-gray-500 mb-2">目前照片功能尚未開放，敬請期待！</p>
-            {/* 這裡可以添加上傳照片的功能 */}
+            <p className="text-sm text-gray-500 mb-4">您可以在這裡上傳醫生的照片，並在更新後顯示在醫生簡介中。</p>
+
+            {/* 一個上傳相片的按鈕 */}
+            <input
+                className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                type="file"
+                name="doctor_photo"
+                accept=".jpg,.jpeg,.png"
+                onChange={(event) => {
+                    attachImages(event);
+                }}
+            />
+            {/* 預覽 */}
+            {imageBlob && (
+                <div className="mt-4">
+                    <img src={imageBlob} alt="預覽照片" className="w-full h-40 object-cover rounded-md" />
+                </div>
+            )}
+            {/* 預覽照片 */}
         </div>
     )
 }
