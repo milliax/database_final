@@ -80,7 +80,7 @@ export default function Login() {
                     customSignIn();
                 }} className="px-10 py-8 space-y-3">
                     <input className={decorateClassName}
-                        placeholder="使用者名稱"
+                        placeholder="身分證字號 | 電子郵件"
                         value={email}
                         type="text"
                         onChange={(event) => {
@@ -88,7 +88,7 @@ export default function Login() {
                         }}
                     />
                     <input className={decorateClassName}
-                        placeholder="密碼"
+                        placeholder="生日末4碼 MMDD | 密碼"
                         type="password"
                         value={password}
                         onChange={event => {
@@ -109,7 +109,7 @@ export default function Login() {
                 </form>
             </div>
 
-            <div>
+            <div className="text-gray-500 flex flex-row gap-3">
                 <span>還沒有帳號嗎</span>
                 <Link href="/register" className="text-sky-600 hover:text-sky-500">立即註冊</Link>
             </div>
