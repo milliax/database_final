@@ -57,7 +57,6 @@ export default function AdminSchedulePage() {
     );
 }
 
-
 const EditDoctorForm = ({
     doctorId
 }: {
@@ -187,8 +186,62 @@ const EditScheduleForm = ({
 }: {
     doctorId: string
 }) => {
+    const [loading, setLoading] = useState(true);
+    const [schedule, setSchedule] = useState<number[]>(Array(21).fill(0));
 
-    const [schedule, setSchedule] = useState<any[]>([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,]);
+    const fetchSchedule = async () => {
+        setLoading(true);
+        const res = await fetch(`/api/admin/doctor/schedule/${doctorId}`);
+        if (!res.ok) {
+            throw new Error('Failed to fetch schedule');
+        }
+        const data = await res.json();
+
+        console.log(data);
+
+        if (data !== null && data) {
+            setSchedule(data);
+        } else {
+            // maping schedule to default values 0
+            const empty_schedule = Array(21).fill(false);
+            console.log("No schedule found, using default values");
+            setSchedule(empty_schedule);
+        }
+
+        setLoading(false);
+    };
+
+    const updateSchedule = async () => {
+        const res = await fetch(`/api/admin/doctor/schedule/${doctorId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                schedule
+            })
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            const issue = data.issues ? data.issues[0].message : '未知錯誤';
+            Swal.fire({
+                icon: 'error',
+                title: '更新失敗',
+                text: issue || '請稍後再試',
+            });
+            throw new Error('Failed to update schedule');
+        }
+        Swal.fire({
+            icon: 'success',
+            title: '排班已更新',
+            text: '醫生的排班已成功更新',
+        });
+
+    }
+
+    useEffect(() => {
+        if (doctorId) {
+            fetchSchedule();
+        }
+    }, [doctorId]);
 
     return (
         <div>
@@ -197,73 +250,76 @@ const EditScheduleForm = ({
                     <h2 className="text-lg font-semibold mb-4">編輯醫生排班</h2>
 
                     <div className="flex flex-col space-y-4">
-                        <div className="grid grid-cols-8 ">
-                            {[0, 1, 2, 3, 4, 5, 6, 7].map((d) => {
-                                if (d === 0) {
-                                    return (
-                                        <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
-                                            <span className="text-sm text-black" />
-                                        </div>
-                                    )
-                                }
-                                return (
-                                    <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
-                                        <span className="text-sm text-black">{`${numberInLetter(d - 1)}`}</span>
-                                    </div>
-                                )
-                            })}
-                            {schedule.map((_, index) => {
-                                if (index === 0 || index === 7 || index === 14) {
-                                    return (
-                                        <React.Fragment key={index}>
-                                            <div className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
-                                                {index === 0 ? (
-                                                    <span className="text-sm text-black">上午</span>
-                                                ) : index === 7 ? (
-                                                    <span className="text-sm text-black">下午</span>
-                                                ) : index === 14 ? (
-                                                    <span className="text-sm text-black">晚上</span>
-                                                ) : null}
+                        {loading ? (
+                            <p className="text-gray-500 text-center">載入中...</p>
+                        ) : (
+                            <React.Fragment>
+                                <div className="grid grid-cols-8 ">
+                                    {[0, 1, 2, 3, 4, 5, 6, 7].map((d) => {
+                                        if (d === 0) {
+                                            return (
+                                                <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
+                                                    <span className="text-sm text-black" />
+                                                </div>
+                                            )
+                                        }
+                                        return (
+                                            <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
+                                                <span className="text-sm text-black">{`${numberInLetter(d - 1)}`}</span>
                                             </div>
-                                            <div className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md cursor-pointer",
-                                                schedule[index] ? "bg-slate-600" : "bg-slate-100")}
-                                                onClick={() => {
-                                                    const newSchedule = [...schedule];
-                                                    newSchedule[index] = !newSchedule[index];
-                                                    setSchedule(newSchedule);
-                                                }}
-                                            />
-                                        </React.Fragment>
-                                    )
-                                }
-                                return (
-                                    <div key={index} className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md cursor-pointer",
-                                        schedule[index] ? "bg-slate-600" : "bg-slate-100")} onClick={() => {
-                                            const newSchedule = [...schedule];
-                                            newSchedule[index] = !newSchedule[index];
-                                            setSchedule(newSchedule);
-                                        }} />
-                                )
-                            })}
+                                        )
+                                    })}
+                                    {schedule.map((_, index) => {
+                                        if (index === 0 || index === 7 || index === 14) {
+                                            return (
+                                                <React.Fragment key={index}>
+                                                    <div className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
+                                                        {index === 0 ? (
+                                                            <span className="text-sm text-black">上午</span>
+                                                        ) : index === 7 ? (
+                                                            <span className="text-sm text-black">下午</span>
+                                                        ) : index === 14 ? (
+                                                            <span className="text-sm text-black">晚上</span>
+                                                        ) : null}
+                                                    </div>
 
-                        </div>
+                                                    <div className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md cursor-pointer",
+                                                        schedule[index] ? "bg-slate-600" : "bg-slate-100")}
+                                                        onClick={() => {
+                                                            const newSchedule = [...schedule];
+                                                            newSchedule[index] = newSchedule[index] ? 0 : 1;
+                                                            setSchedule(newSchedule);
+                                                        }}
+                                                    />
+                                                </React.Fragment>
+                                            )
+                                        }
+                                        return (
+                                            <div key={index} className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md cursor-pointer",
+                                                schedule[index] ? "bg-slate-600" : "bg-slate-100")} onClick={() => {
+                                                    const newSchedule = [...schedule];
+                                                    newSchedule[index] = newSchedule[index] ? 0 : 1;
+                                                    setSchedule(newSchedule);
+                                                }} />
+                                        )
+                                    })}
+                                </div>
+                            </React.Fragment>
+                        )}
                     </div>
                     <button
                         className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer mt-4"
                         onClick={() => {
-                            console.log("Submitting schedule for doctor ID:", doctorId, "Schedule:", schedule);
-                            Swal.fire({
-                                icon: 'success',
-                                title: '排班已更新',
-                                text: '醫生的排班已成功更新',
-                            });
+                            console.log("Updating schedule for doctor ID:", doctorId);
+                            updateSchedule();
                         }}
                     >
                         更新排班
                     </button>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     )
 }
 
@@ -272,6 +328,10 @@ const EditPhoto = ({
 }: {
     doctorId: string
 }) => {
+    if(!doctorId) {
+        return <></>
+    }
+
     return (
         <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
             <h2 className="text-lg font-semibold mb-4">編輯醫生照片</h2>

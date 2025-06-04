@@ -15,21 +15,36 @@ export const GET = async (req: NextRequest, { params }: { params: Promise<{ doct
     try {
         const doctorId = await params;
 
-        const doctor = await prisma.doctor.findUnique({
+        const user = await prisma.user.findUnique({
             where: { id: doctorId.doctorId },
             select: {
+                doctor: {
+                    select: {
+                        id: true
+                    }
+                }
+            }
+        });
+
+        if (!user || !user.doctor) {
+            return NextResponse.json({ error: 'Doctor not found' }, { status: 404 });
+        }
+
+        const doctor = await prisma.doctor.findUnique({
+            where: { id: user.doctor.id },
+            select: {
                 schedules: {
-                    take: 2,
+                    take: 1,
                     orderBy: {
                         createdAt: 'desc'
                     }
                 }
             }
         });
-        
+
         console.log(doctor?.schedules)
 
-        return NextResponse.json(doctor);
+        return NextResponse.json(doctor?.schedules?.[0]?.slots || null);
     } catch (error) {
         console.error('Error fetching doctors:', error);
         return NextResponse.json({ error: 'Failed to fetch doctors' }, { status: 500 });
@@ -43,19 +58,47 @@ export const PUT = async (req: NextRequest, { params }: { params: Promise<{ doct
     }
 
     const { doctorId } = await params;
-    const body = await req.json();
 
     const putSchema = z.object({
-        schedule: z.array(z.boolean()).length(21)
+        schedule: z.array(z.number()).length(21)
     });
 
     try {
-        const updatedDoctor = await prisma.doctor.update({
+        const user = await prisma.user.findUnique({
             where: { id: doctorId },
-            data: body,
+            select: {
+                doctor: {
+                    select: {
+                        id: true
+                    }
+                }
+            }
         });
 
-        return NextResponse.json(updatedDoctor);
+        if (!user || !user.doctor) {
+            return NextResponse.json({ error: 'Doctor not found' }, { status: 404 });
+        }
+
+        const body = await req.json();
+        const parsedBody = putSchema.safeParse(body);
+        if (!parsedBody.success) {
+            return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+        }
+
+        const schedule = parsedBody.data.schedule;
+
+        console.log(schedule)
+
+        const s = await prisma.schedule.create({
+            data: {
+                doctorId: user.doctor.id,
+
+                slots: schedule.map((isAvailable, index) => (isAvailable ? 1 : 0)),
+                startTime: new Date()
+            }
+        })
+
+        return NextResponse.json({ success: true, message: 'Schedule updated successfully' });
     } catch (error) {
         console.error('Error updating doctor schedule:', error);
         return NextResponse.json({ error: 'Failed to update doctor schedule' }, { status: 500 });

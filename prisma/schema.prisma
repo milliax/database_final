@@ -5,189 +5,189 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-    provider = "prisma-client-js"
-    output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
-    ADMIN
-    DOCTOR
-    PATIENT
+  ADMIN
+  DOCTOR
+  PATIENT
 }
 
 enum ConsultationStatus {
-    PENDING
+  PENDING
 
-    CHECKED_IN
+  CHECKED_IN
 
-    IN_PROGRESS
-    COMPLETED
+  IN_PROGRESS
+  COMPLETED
 
-    NO_SHOW
+  NO_SHOW
 
-    CANCELLED
+  CANCELLED
 }
 
 model User {
-    // account for a user signable
-    id String @id @default(cuid())
+  // account for a user signable
+  id String @id @default(cuid())
 
-    // username String  @unique
-    email    String? @unique
-    password String
+  // username String  @unique
+  email    String? @unique
+  password String
 
-    name    String?
-    phone   String?
-    address String?
+  name    String?
+  phone   String?
+  address String?
 
-    emailVerified DateTime?
-    image         String?
-    sessions      Session[]
+  emailVerified DateTime?
+  image         String?
+  sessions      Session[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    // custom fields below
-    role    Role     @default(PATIENT)
-    doctor  Doctor?
-    patient Patient?
+  // custom fields below
+  role    Role     @default(PATIENT)
+  doctor  Doctor?
+  patient Patient?
 }
 
 model Session {
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Patient {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    // custom fields below
+  // custom fields below
 
-    birth_date DateTime
-    bio        String?
+  birth_date DateTime
+  bio        String?
 
-    id_card_number     String   @unique
-    id_card_issue_date DateTime
-    id_card_location   String
-    id_card_issue_type String
+  id_card_number     String   @unique
+  id_card_issue_date DateTime
+  id_card_location   String
+  id_card_issue_type String
 
-    id_card_image String?
+  id_card_image String?
 
-    consultations Consultation[]
-    appointments  Appointment[]
+  consultations Consultation[]
+  appointments  Appointment[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Doctor {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    // custom fields below
-    bio String?
+  // custom fields below
+  bio String?
 
-    schedules     Schedule[]
-    appointments  Appointment[]
-    consultations Consultation[]
+  schedules     Schedule[]
+  appointments  Appointment[]
+  consultations Consultation[]
 
-    createdAt    DateTime    @default(now())
-    updatedAt    DateTime    @updatedAt
-    department   Department? @relation(fields: [departmentId], references: [id])
-    departmentId String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
 }
 
 model Schedule {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    doctorId String
-    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
-    // custom fields below
-    startTime DateTime // start time of the schedule
-    slots     Int[] // number of slots available for the day
+  // custom fields below
+  startTime DateTime // start time of the schedule
+  slots     Int[] // number of slots available for the day
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Consultation {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    doctorId String
-    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
-    patientId String
-    patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
-    // custom fields below
-    description  String?
-    prescription String?
-    status       ConsultationStatus? @default(PENDING)
+  // custom fields below
+  description  String?
+  prescription String?
+  status       ConsultationStatus? @default(PENDING)
 
-    feedback Feedback[]
+  feedback Feedback[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Appointment {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    doctorId String
-    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
-    patientId String
-    patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
-    // custom fields below
-    slot   Int // from 0 to 20
-    status String? @default("PENDING")
+  // custom fields below
+  slot   Int // from 0 to 20
+  status String? @default("PENDING")
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Feedback {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    consultation   Consultation? @relation(fields: [consultationId], references: [id])
-    consultationId String?
+  consultation   Consultation? @relation(fields: [consultationId], references: [id])
+  consultationId String?
 
-    rating  Int?
-    comment String?
+  rating  Int?
+  comment String?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Department {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    name String @unique
+  name String @unique
 
-    // custom fields below
-    description String?
+  // custom fields below
+  description String?
 
-    doctors Doctor[]
+  doctors Doctor[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
