@@ -1,4 +1,4 @@
-import { AuthOptions } from "next-auth"
+import { AuthOptions, User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { hash, compare } from "bcrypt";
@@ -57,11 +57,15 @@ export const authOptions: AuthOptions = {
                     // console.log("logged in user")
                     // console.log(user)
 
-                    return user
+                    return {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        role: user.role,
+                    } as User;
                 } else {
                     // If you return null then an error will be displayed advising the user to check their details.
                     return null
-
                     // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
                 }
             },
@@ -92,7 +96,9 @@ export const authOptions: AuthOptions = {
 
             if (user) {
                 token.role = user.role
-                token.username = user.username
+                token.email = user.email
+                token.id = user.id
+                token.name = user.name
             }
             return token
         }

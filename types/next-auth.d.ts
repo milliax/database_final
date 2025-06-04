@@ -3,11 +3,14 @@
 import NextAuth, { DefaultSession, DefaultJWT } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
+import { Prisma } from "@/generated/prisma";
+
 declare module "next-auth" {
     interface User extends UserModel {
         id: string;
-        email: string,
-        role: string
+        email: string;
+        role: Role;
+        name: string;
     }
 
     interface Session extends DefaultSession {
