@@ -4,13 +4,19 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
 
-export const GET = async (request: NextRequest, { params }: { params: { doctor_id: string } }) => {
-    const doctorId = params.doctor_id;
+export const GET = async (request: NextRequest, { params }: { params: Promise<{ doctor_id: string }> }) => {
+    const doctorId = (await params).doctor_id;
 
     try {
         const doctor = await prisma.user.findUnique({
             where: { id: doctorId },
-            include: { doctor: true },
+            include: {
+                doctor: {
+                    include: {
+                        department: true,
+                    },
+                }
+            },
         });
 
         if (!doctor) {
@@ -26,8 +32,8 @@ export const GET = async (request: NextRequest, { params }: { params: { doctor_i
 
 import { z } from 'zod';
 
-export const PUT = async (request: NextRequest, { params }: { params: { doctor_id: string } }) => {
-    const doctorId = params.doctor_id;
+export const PUT = async (request: NextRequest, { params }: { params: Promise<{ doctor_id: string }> }) => {
+    const doctorId = (await params).doctor_id;
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== 'ADMIN') {

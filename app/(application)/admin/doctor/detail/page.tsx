@@ -1,7 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import TextareaAutosize from "react-textarea-autosize"
+import clsx from "clsx";
+
+import { numberInLetter } from "@/lib/utils";
 
 export default function AdminSchedulePage() {
     const [doctor, setDoctor] = useState<any[]>([]);
@@ -25,9 +29,10 @@ export default function AdminSchedulePage() {
 
     return (
         <div className="flex flex-col items-center  bg-gray-50">
-            <h1 className="text-2xl font-bold text-center my-8">醫生簡介變更</h1>
+            <h1 className="text-2xl font-bold text-center my-8">醫生基本資料設定</h1>
             <section className="flex flex-row w-[60rem]">
-                <nav className="flex flex-col rounded-md bg-white shadow-md">
+
+                <nav className="flex flex-col rounded-md bg-white shadow-md h-fit">
                     {doctor.map((d) => (
                         <div key={d.id} className="p-4 border-b hover:bg-gray-50 cursor-pointer select-none" onClick={() => {
                             setSelectedDoctor(d.id);
@@ -42,18 +47,10 @@ export default function AdminSchedulePage() {
                     ))}
                 </nav>
 
-                <div className="w-full min-h-60">
+                <div className="w-full min-h-60 py-20">
                     <EditDoctorForm doctorId={selectedDoctor} />
-                    {/* <textarea className="w-full h-full p-4 border rounded-md bg-white shadow-md"
-                        placeholder="請在此輸入醫生簡介..."
-                        value={selectedDoctor ? doctor.find(d => d.id === selectedDoctor)?.description || '' : ''}
-                        onChange={(e) => {
-                            const updatedDoctor = doctor.map(d =>
-                                d.id === selectedDoctor ? { ...d, description: e.target.value } : d
-                            );
-                            setDoctor(updatedDoctor);
-                        }}
-                    /> */}
+                    <EditScheduleForm doctorId={selectedDoctor} />
+                    <EditPhoto doctorId={selectedDoctor} />
                 </div>
             </section>
         </div>
@@ -116,7 +113,7 @@ const EditDoctorForm = ({
 
                 setBio(data.doctor.bio || "");
                 setName(data.name || "");
-                setDepartment(data.doctor.department || "");
+                setDepartment(data.doctor.department.name || "");
                 setImageURL(data.image || "");
 
                 setLoading(false);
@@ -130,6 +127,8 @@ const EditDoctorForm = ({
 
     return (
         <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
+            <h2 className="text-lg font-semibold mb-4">醫生簡介</h2>
+
             {doctorId ? (
                 <form className="flex flex-col space-y-4" onSubmit={(event) => {
                     event.preventDefault();
@@ -157,7 +156,8 @@ const EditDoctorForm = ({
 
                     <div className="flex flex-row gap-3 items-center">
                         <label className="block text-sm font-medium text-gray-700 w-12">個人經歷</label>
-                        <textarea
+                        <TextareaAutosize
+                            placeholder="請輸入醫生的個人經歷或簡介"
                             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
                             rows={4}
                             value={bio || ""}
@@ -178,6 +178,105 @@ const EditDoctorForm = ({
             ) : (
                 <p className="text-gray-500 text-center">請選擇一位醫生以編輯其簡介</p>
             )}
+        </div>
+    )
+}
+
+const EditScheduleForm = ({
+    doctorId
+}: {
+    doctorId: string
+}) => {
+
+    const [schedule, setSchedule] = useState<any[]>([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,]);
+
+    return (
+        <div>
+            {doctorId && (
+                <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
+                    <h2 className="text-lg font-semibold mb-4">編輯醫生排班</h2>
+
+                    <div className="flex flex-col space-y-4">
+                        <div className="grid grid-cols-8 ">
+                            {[0, 1, 2, 3, 4, 5, 6, 7].map((d) => {
+                                if (d === 0) {
+                                    return (
+                                        <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
+                                            <span className="text-sm text-black" />
+                                        </div>
+                                    )
+                                }
+                                return (
+                                    <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
+                                        <span className="text-sm text-black">{`${numberInLetter(d - 1)}`}</span>
+                                    </div>
+                                )
+                            })}
+                            {schedule.map((_, index) => {
+                                if (index === 0 || index === 7 || index === 14) {
+                                    return (
+                                        <React.Fragment key={index}>
+                                            <div className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
+                                                {index === 0 ? (
+                                                    <span className="text-sm text-black">上午</span>
+                                                ) : index === 7 ? (
+                                                    <span className="text-sm text-black">下午</span>
+                                                ) : index === 14 ? (
+                                                    <span className="text-sm text-black">晚上</span>
+                                                ) : null}
+                                            </div>
+                                            <div className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md cursor-pointer",
+                                                schedule[index] ? "bg-slate-600" : "bg-slate-100")}
+                                                onClick={() => {
+                                                    const newSchedule = [...schedule];
+                                                    newSchedule[index] = !newSchedule[index];
+                                                    setSchedule(newSchedule);
+                                                }}
+                                            />
+                                        </React.Fragment>
+                                    )
+                                }
+                                return (
+                                    <div key={index} className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md cursor-pointer",
+                                        schedule[index] ? "bg-slate-600" : "bg-slate-100")} onClick={() => {
+                                            const newSchedule = [...schedule];
+                                            newSchedule[index] = !newSchedule[index];
+                                            setSchedule(newSchedule);
+                                        }} />
+                                )
+                            })}
+
+                        </div>
+                    </div>
+                    <button
+                        className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer mt-4"
+                        onClick={() => {
+                            console.log("Submitting schedule for doctor ID:", doctorId, "Schedule:", schedule);
+                            Swal.fire({
+                                icon: 'success',
+                                title: '排班已更新',
+                                text: '醫生的排班已成功更新',
+                            });
+                        }}
+                    >
+                        更新排班
+                    </button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+const EditPhoto = ({
+    doctorId
+}: {
+    doctorId: string
+}) => {
+    return (
+        <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
+            <h2 className="text-lg font-semibold mb-4">編輯醫生照片</h2>
+            <p className="text-sm text-gray-500 mb-2">目前照片功能尚未開放，敬請期待！</p>
+            {/* 這裡可以添加上傳照片的功能 */}
         </div>
     )
 }

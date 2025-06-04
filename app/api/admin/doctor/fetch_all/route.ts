@@ -16,11 +16,7 @@ export const GET = async () => {
                 role: 'DOCTOR',
             },
             include: {
-                doctor: {
-                    include:{
-                        department: true
-                    }
-                },
+                doctor: true
             },
         });
 
