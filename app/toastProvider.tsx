@@ -17,6 +17,7 @@ export default function ToastProvider({
     useClarityPageView();
 
     return (
+        
         <React.Fragment>
             <SessionProvider>
                 {children}
