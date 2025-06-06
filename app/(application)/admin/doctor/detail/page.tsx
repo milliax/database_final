@@ -45,7 +45,7 @@ export default function AdminSchedulePage() {
                         }}>
                             <img src={d.image || "/images/default-doctor.jpg"}
                                 alt={d.name}
-                                className="w-16 h-16 rounded-full mb-2" />
+                                className="w-16 h-16 rounded-full mb-2 object-cover" />
                             <h2 className="text-lg font-semibold">{d.name}</h2>
                             <p className="text-sm text-gray-600">{d.department}</p>
                         </div>
@@ -131,7 +131,7 @@ const EditDoctorForm = ({
 
                 setBio(data.doctor.bio || "");
                 setName(data.name || "");
-                setDepartment(data.doctor.department.name || "");
+                setDepartment(data.doctor.department?.name || "");
                 setImageURL(data.image || "");
 
                 setLoading(false);
