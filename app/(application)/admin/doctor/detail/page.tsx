@@ -66,8 +66,13 @@ export default function AdminSchedulePage() {
                     ) : (
                         <React.Fragment>
                             <EditDoctorForm doctorId={selectedDoctor} />
-                            <EditScheduleForm doctorId={selectedDoctor} />
-                            <EditPhoto doctorId={selectedDoctor} />
+                            {selectedDoctor && (
+                                <React.Fragment>
+                                    <EditScheduleForm doctorId={selectedDoctor} />
+                                    <EditPhoto doctorId={selectedDoctor} />
+                                    <EditPasswordForm doctorId={selectedDoctor} />
+                                </React.Fragment>
+                            )}
                         </React.Fragment>
                     )}
                 </div>
@@ -418,9 +423,9 @@ const EditPhoto = ({
 }
 
 const NewDoctor = () => {
-    const [name,setName] = useState<string>("");
-    const [email,setEmail] = useState<string>("");
-    const [password,setPassword] = useState<string>("");
+    const [name, setName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
 
     const createdoctor = async () => {
         const res = await fetch('/api/admin/doctor/create', {
@@ -495,6 +500,66 @@ const NewDoctor = () => {
                     className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                 >
                     新增醫生
+                </button>
+            </form>
+        </div>
+    )
+}
+const EditPasswordForm = ({
+    doctorId
+}: {
+    doctorId: string
+}) => {
+    const [password, setPassword] = useState<string>("");
+
+    const updatePassword = async () => {
+        const res = await fetch(`/api/admin/doctor/password/${doctorId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                password
+            })
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            const issue = data.issues ? data.issues[0].message : '未知錯誤';
+            Swal.fire({
+                icon: 'error',
+                title: '更新失敗',
+                text: issue || '請稍後再試',
+            });
+            throw new Error('Failed to update password');
+        }
+        Swal.fire({
+            icon: 'success',
+            title: '密碼已更新',
+            text: '醫生的密碼已成功更新',
+        });
+    }
+
+    return (
+        <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
+            <h2 className="text-lg font-semibold mb-4">編輯醫生密碼</h2>
+            <p className="text-sm text-gray-500 mb-4">您可以在這裡編輯醫生的密碼。</p>
+            <form className="flex flex-col space-y-4" onSubmit={(event) => {
+                event.preventDefault();
+                updatePassword();
+            }}>
+                <div className="flex flex-row gap-3 items-center">
+                    <label className="block text-sm font-medium text-gray-700 w-12">新密碼</label>
+                    <input
+                        type="password"
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="請輸入新密碼"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                >
+                    更新密碼
                 </button>
             </form>
         </div>
