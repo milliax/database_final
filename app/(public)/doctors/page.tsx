@@ -56,8 +56,13 @@ export default function DoctorSummaryPage() {
                                         </p>
                                     );
                                 })}
-                                <div className="mt-4">
-                                    <Link href={`/doctor/${d.id}`} className="text-blue-600 hover:underline">門診時間</Link>
+                                <div className="mt-4 flex justify-end">
+                                    <Link
+                                        href={`/doctor/${d.id}`}
+                                        className="text-xl px-6 py-2 rounded-full bg-yellow-400 text-black hover:bg-green-800 hover:text-white transition hover:scale-110 duration-75"
+                                    >
+                                        我要預約
+                                    </Link>
                                 </div>
                                 <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
                             </div>
