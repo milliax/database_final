@@ -7,11 +7,14 @@ import clsx from "clsx";
 
 import { numberInLetter } from "@/lib/utils";
 import { uploadImageToSupabase } from '@/lib/uploadHelper';
+import { set } from "date-fns";
 
 export default function AdminSchedulePage() {
     const [doctor, setDoctor] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDoctor, setSelectedDoctor] = useState<string>("");
+
+    const [newDoctor, setNewDoctor] = useState<boolean>(false);
 
     const fetchDoctors = async () => {
         const res = await fetch('/api/admin/doctor/fetch_all')
@@ -37,6 +40,7 @@ export default function AdminSchedulePage() {
                     {doctor.map((d) => (
                         <div key={d.id} className="p-4 border-b hover:bg-gray-50 cursor-pointer select-none" onClick={() => {
                             setSelectedDoctor(d.id);
+                            setNewDoctor(false);
                             console.log("Selected Doctor ID:", d.id);
                         }}>
                             <img src={d.image || "/images/default-doctor.jpg"}
@@ -46,12 +50,26 @@ export default function AdminSchedulePage() {
                             <p className="text-sm text-gray-600">{d.department}</p>
                         </div>
                     ))}
+                    <div className="text-4xl w-full aspect-square flex items-center justify-center text-gray-400 hover:bg-gray-50 cursor-pointer select-none" onClick={() => {
+                        // alert("新增醫生功能尚未開放，敬請期待！")
+                        setNewDoctor(true);
+                        setSelectedDoctor("");
+                    }}>
+                        +
+                    </div>
                 </nav>
 
                 <div className="w-full min-h-60 py-20">
-                    <EditDoctorForm doctorId={selectedDoctor} />
-                    <EditScheduleForm doctorId={selectedDoctor} />
-                    <EditPhoto doctorId={selectedDoctor} />
+
+                    {newDoctor ? (
+                        <NewDoctor />
+                    ) : (
+                        <React.Fragment>
+                            <EditDoctorForm doctorId={selectedDoctor} />
+                            <EditScheduleForm doctorId={selectedDoctor} />
+                            <EditPhoto doctorId={selectedDoctor} />
+                        </React.Fragment>
+                    )}
                 </div>
             </section>
         </div>
@@ -357,7 +375,7 @@ const EditPhoto = ({
             })
         })
 
-        if(!res.ok){
+        if (!res.ok) {
             Swal.fire({
                 icon: 'error',
                 title: '上傳失敗',
@@ -395,6 +413,90 @@ const EditPhoto = ({
                 </div>
             )}
             {/* 預覽照片 */}
+        </div>
+    )
+}
+
+const NewDoctor = () => {
+    const [name,setName] = useState<string>("");
+    const [email,setEmail] = useState<string>("");
+    const [password,setPassword] = useState<string>("");
+
+    const createdoctor = async () => {
+        const res = await fetch('/api/admin/doctor/create', {
+            method: 'POST',
+            body: JSON.stringify({
+                name,
+                email,
+                password
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            const issue = data.issues ? data.issues[0].message : '未知錯誤';
+            Swal.fire({
+                icon: 'error',
+                title: '新增醫生失敗',
+                text: issue || '請稍後再試',
+            });
+            throw new Error('Failed to create doctor');
+        }
+        Swal.fire({
+            icon: 'success',
+            title: '新增醫生成功',
+            text: '醫生已成功新增，請在醫生列表中查看。',
+        });
+        console.log("Created doctor data:", data);
+    }
+    return (
+        <div className="p-4 bg-white shadow-md rounded-md w-full max-w-md mx-auto">
+            <h2 className="text-lg font-semibold mb-4">新增醫生</h2>
+            <p className="text-sm text-gray-500 mb-4">您可以在這裡新增醫生的基本資料，並在更新後顯示在醫生列表中。</p>
+            {/* 新增醫生的表單 */}
+            <form className="flex flex-col space-y-4" onSubmit={(event) => {
+                event.preventDefault();
+                createdoctor();
+            }}>
+                <div className="flex flex-row gap-3 items-center">
+                    <label className="block text-sm font-medium text-gray-700 w-12">姓名</label>
+                    <input
+                        type="text"
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="請輸入醫生姓名"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                </div>
+
+                <div className="flex flex-row gap-3 items-center">
+                    <label className="block text-sm font-medium text-gray-700 w-12">電子郵件</label>
+                    <input
+                        type="text"
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="請輸入電子郵件"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+
+                <div className="flex flex-row gap-3 items-center">
+                    <label className="block text-sm font-medium text-gray-700 w-12">密碼</label>
+                    <input
+                        placeholder="請輸入密碼"
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        // type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                >
+                    新增醫生
+                </button>
+            </form>
         </div>
     )
 }
