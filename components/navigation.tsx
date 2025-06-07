@@ -11,7 +11,6 @@ import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 
 export default function Navigation() {
-
     const { data: session, status } = useSession();
     const [user, setUser] = useState<any>(null);
     const [open, setOpen] = useState(false);
@@ -59,7 +58,7 @@ export default function Navigation() {
                         {open && (
                             <div className="absolute left-0 mt-2 w-32 bg-white border rounded shadow z-10">
                                 <Link
-                                    href="/department"
+                                    href="/doctors"
                                     className="block px-4 py-2 text-slate-900 hover:bg-slate-100"
                                 >
                                     預約

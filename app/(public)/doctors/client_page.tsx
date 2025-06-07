@@ -1,44 +1,31 @@
-
+"use client"
 
 import Image from "next/image";
 import Link from "next/link";
 
-import { prisma } from "@/lib/prisma";
-
-export default async function DoctorSummaryPage() {
-    const doctors = await prisma.doctor.findMany({
-        select: {
-            id: true,
-            bio: true,
-            updatedAt: true,
-            user: {
-                select: {
-                    name: true,
-                    image: true,
-                }
-            },
-            department: {
-                select: {
-                    name: true,
-                }
-            }
-        }
-    })
-
+export default function DoctorSummaryPage({
+    doctors,
+    departments,
+    department_name,
+}: {
+    departments: string[]
+    doctors: any[]
+    department_name: string
+}) {
     // console.log(doctors)
 
-    const departmentNames = new Set(doctors.map(d => d.department?.name ?? ""));
-    let doctorsByDepartment: { [key: string]: any[] } = {};
+    // const departmentNames = new Set(doctors.map(d => d.department?.name ?? ""));
+    // let doctorsByDepartment: { [key: string]: any[] } = {};
 
-    doctors.forEach((doctor) => {
-        const departmentName = doctor.department?.name || "未分類";
-        if (!doctorsByDepartment[departmentName]) {
-            doctorsByDepartment[departmentName] = [];
-        }
-        doctorsByDepartment[departmentName].push(doctor);
-    });
+    // doctors.forEach((doctor) => {
+    //     const departmentName = doctor.department?.name || "未分類";
+    //     if (!doctorsByDepartment[departmentName]) {
+    //         doctorsByDepartment[departmentName] = [];
+    //     }
+    //     doctorsByDepartment[departmentName].push(doctor);
+    // });
 
-    console.log(doctorsByDepartment);
+    // const doctorInThisDepartment = doctors.filter((d) => encodeURI(d.department?.name ?? "") === department);
 
     return (
         <section className="w-full flex flex-row p-5 max-w-6xl mx-auto">
@@ -48,7 +35,7 @@ export default async function DoctorSummaryPage() {
                         全部醫師
                     </li>
                 </Link>
-                {Array.from(departmentNames).map((name) => (
+                {departments.map((name) => (
                     <Link key={name} href={`/doctors/${name}`} passHref>
                         <li className="block text-green-700 hover:text-green-900 bg-white rounded-md w-full border ">
                             {name}
@@ -57,7 +44,7 @@ export default async function DoctorSummaryPage() {
                 ))}
             </ul>
             <div className="w-3/5 mx-auto px-4 py-10">
-                <h1 className="text-3xl font-bold text-center text-green-700 mb-6">全部</h1>
+                <h1 className="text-3xl font-bold text-center text-green-700 mb-6">{department_name}</h1>
                 {doctors.map((d) => {
                     // console.log(d.doctor.bio)
                     const b = d.bio || "";
