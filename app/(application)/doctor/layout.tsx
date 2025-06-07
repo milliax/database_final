@@ -17,7 +17,7 @@ export default async function AdminLayout({
     children: React.ReactNode;
 }) {
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || session.user.role !== 'DOCTOR') {
         redirect('/'); // Redirect to unauthorized page if not admin
     }
 

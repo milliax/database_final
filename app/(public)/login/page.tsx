@@ -20,6 +20,7 @@ export default async function LoginPage() {
         if (session.user) {
             // @ts-ignore
             const role = session.user.role as string
+            console.log("User role:", role)
 
             switch (role) {
                 case "ADMIN":

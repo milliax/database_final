@@ -1,76 +1,77 @@
-import Image from "next/image";
-export default function Home() {
+"use client";
+import { Session } from "inspector/promises";
+import React, { useEffect, useState } from "react";
+
+// 假設你有取得登入醫生的 id
+// 實際專案請用 session 或 context 取得 doctorId
+const doctorId = "CURRENT_DOCTOR_ID";
+
+const timeSlots = ["上午", "下午", "晚上"];
+const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
+
+type ScheduleCell = {
+    hasSchedule: boolean;
+    scheduleInfo?: string; // 你可以放更多資訊
+};
+
+export default function DoctorSchedulePage() {
+    const [schedule, setSchedule] = useState<ScheduleCell[][]>(
+        Array(3).fill(null).map(() => Array(7).fill({ hasSchedule: false }))
+    );
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // 取得本週起始日（週日）
+        const today = new Date();
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        weekStart.setHours(0, 0, 0, 0);
+
+        fetch(`/api/doctor/schedule?doctorId=${doctorId}&weekStart=${weekStart.toISOString()}`)
+            .then(res => res.json())
+            .then(data => {
+                // data: [{ day: 0~6, slot: 0~2, info: string }]
+                const newSchedule = Array(3).fill(null).map(() => Array(7).fill({ hasSchedule: false }));
+                data.forEach((item: { day: number; slot: number; info?: string }) => {
+                    newSchedule[item.slot][item.day] = { hasSchedule: true, scheduleInfo: item.info };
+                });
+                setSchedule(newSchedule);
+                setLoading(false);
+            });
+    }, []);
+
     return (
-        <div className="font-sans">
-            {/* Header */}
-            {/* <header className="bg-yellow-300 px-6 py-2 text-sm flex justify-between items-center">
-                <div className="text-gray-800">
-                    回醫療體系首頁 | 回台大醫院首頁 | 網站導覽 | English | 日本語
-                </div>
-                <div className="flex space-x-2">
-                    <button className="text-xs">A-</button>
-                    <button className="text-xs font-bold">A</button>
-                    <button className="text-xs">A+</button>
-                </div>
-            </header> */}
-
-            {/* Logo and Navigation */}
-            <div className="bg-yellow-400 px-6 py-4 flex items-center justify-between">
-                <div className="text-2xl font-bold">
-                    <span className="text-green-700">邱綜合醫院</span> 
-                    {/* 國立臺灣大學醫學院附設醫院 */}
-                </div>
-                <nav className="flex space-x-4 text-sm">
-                    <a href="#">訊息專區</a>
-                    <a href="#">認識本院</a>
-                    <a href="#">就醫指南</a>
-                    <a href="#">醫療團隊</a>
-                    <a href="#">特色醫療</a>
-                    <a href="#">為民服務</a>
-                    <a href="#">教學研究</a>
-                </nav>
-            </div>
-
-            {/* Image Banner */}
-            <div className="w-full h-[40rem] bg-cover bg-center">
-                {/* Image slider dots if needed */}
-                <Image src="/images/library.jpg"
-                    alt="library"
-                    width={800}
-                    height={600}
-                    className="w-full h-full object-cover"
-                />
-            </div>
-
-            {/* Function Bar */}
-            <div className="bg-yellow-200 px-6 py-6 text-center">
-                <div className="max-w-4xl mx-auto">
-                    <div className="flex justify-center space-x-4 mb-4">
-                        <input placeholder="搜尋..." className="w-full max-w-md" />
-                    </div>
-                    <div className="flex justify-center space-x-8 text-sm">
-                        <button className="flex flex-col items-center">
-                            {/* <Search className="mb-1" /> 網路掛號 */}
-                        </button>
-                        <button className="flex flex-col items-center">
-                            {/* <Calendar className="mb-1" /> 門診相關 */}
-                        </button>
-                        <button className="flex flex-col items-center">
-                            {/* <User className="mb-1" /> 尋找醫師 */}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Icon Grid */}
-            <div className="bg-yellow-100 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 text-sm text-center">
-                <div>🏥 住院及探病相關</div>
-                <div>🩺 健康檢查</div>
-                <div>🧳 海外病友</div>
-                <div>📍 交通設施</div>
-                <div>💊 衛教及用藥諮詢</div>
-                <div>📄 就醫資料申請</div>
-                <div>➕ 人才招募</div>
+        <div className="max-w-3xl mx-auto py-10">
+            <h1 className="text-2xl font-bold mb-6 text-center">本週時段表</h1>
+            <div className="overflow-x-auto">
+                <table className="min-w-full border border-gray-300 bg-white">
+                    <thead>
+                        <tr>
+                            <th className="border px-4 py-2 bg-gray-100"></th>
+                            {weekDays.map((day, idx) => (
+                                <th key={idx} className="border px-4 py-2 bg-gray-100">{day}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {timeSlots.map((slot, slotIdx) => (
+                            <tr key={slotIdx}>
+                                <td className="border px-4 py-2 font-semibold bg-gray-100">{slot}</td>
+                                {schedule[slotIdx].map((cell, dayIdx) => (
+                                    <td key={dayIdx} className="border px-4 py-2 text-center">
+                                        {loading ? (
+                                            <span className="text-gray-400">載入中</span>
+                                        ) : cell.hasSchedule ? (
+                                            <span className="text-green-600 font-bold">✔</span>
+                                        ) : (
+                                            <span className="text-gray-300">—</span>
+                                        )}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

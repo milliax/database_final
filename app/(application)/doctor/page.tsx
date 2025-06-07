@@ -1,4 +1,4 @@
-export default function AdminSummaryPage() {
+export default function DoctorSummaryPage() {
     return (
         <div>
             <h1>Doctor Summary</h1>
