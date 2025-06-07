@@ -196,6 +196,8 @@ model ConsultingRoom {
     status     ConsultingRoomStatus @default(PENDING)
     number_now Int                  @default(0) // current number in the room
 
+    max_consultation_number Int @default(50)// maximum number of consultations in the room
+
     consultations Consultation[]
 
     feedback   Feedback? @relation(fields: [feedbackId], references: [id])
