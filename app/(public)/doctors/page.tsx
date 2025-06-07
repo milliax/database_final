@@ -64,6 +64,7 @@ export default async function DoctorSummaryPage() {
             departments={departments}
             doctors={doctors}
             department_name="全部"
+            department_id="all"
         />
     );
 }
