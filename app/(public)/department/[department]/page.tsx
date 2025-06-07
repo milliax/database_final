@@ -35,14 +35,19 @@ export default async function DepartmentPage({
         }
     })
 
-    const all_departments = new Set(doctors.map(d => ({
-        // d.department?.name ?? "",
-        name: d.department?.name ?? "",
-        id: d.department?.id ?? ""
-    })));
+    let department_mapping: {
+        [key: string]: string
+    } = {}
+
+    const departmentNames = new Set(doctors.map(d => {
+        if (d.department && d.department.id) {
+            department_mapping[d.department.id] = d.department.name;
+        }
+        return d.department?.name ?? ""
+    }));
 
 
-    const doctorInThisDepartment = doctors.filter((d) => d.department?.name === department);
+    const doctorInThisDepartment = doctors.filter((d) => d.department?.id === department);
 
     let schedules: string[][] = [];
 
@@ -60,11 +65,27 @@ export default async function DepartmentPage({
         })
     }
 
+    const departments = Array.from(departmentNames)
+        .filter(name => name !== "")
+        .map(name => ({
+            name,
+            id: Object.keys(department_mapping).find(key => department_mapping[key] === name) || ""
+        }));
+
+    const department_name = await prisma.department.findUnique({
+        where: {
+            id: department
+        },
+        select: {
+            name: true
+        }
+    });
+
     return (
         <ClientPage
-            departments={Array.from(all_departments).filter(d => d.name !== "")}
+            departments={departments}
             schedules={schedules}
-            department_name={department}
+            department_name={department_name?.name || "未知科別"}
         />
     );
 }

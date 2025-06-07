@@ -22,15 +22,24 @@ export default async function DoctorSummaryPage() {
                     id: true
                 }
             }
+        },
+        orderBy: {
+            createdAt: 'asc'
         }
     })
 
     // console.log(doctors)
-    const departmentNames = new Set(doctors.map(d => ({
-        // d.department?.name ?? "",
-        name: d.department?.name ?? "",
-        id: d.department?.id ?? ""
-    })));
+    let department_mapping: {
+        [key: string]: string
+    } = {}
+
+    const departmentNames = new Set(doctors.map(d => {
+        if (d.department && d.department.id) {
+            department_mapping[d.department.id] = d.department.name;
+        }
+        return d.department?.name ?? ""
+    }));
+
     let doctorsByDepartment: { [key: string]: any[] } = {};
 
     doctors.forEach((doctor) => {
@@ -43,9 +52,16 @@ export default async function DoctorSummaryPage() {
 
     console.log(doctorsByDepartment);
 
+    const departments = Array.from(departmentNames)
+        .filter(name => name !== "")
+        .map(name => ({
+            name,
+            id: Object.keys(department_mapping).find(key => department_mapping[key] === name) || ""
+        }));
+
     return (
         <ClientPage
-            departments={Array.from(departmentNames).filter(d => d.name !== "")}
+            departments={departments}
             doctors={doctors}
             department_name="全部"
         />

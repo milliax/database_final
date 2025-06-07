@@ -39,5 +39,5 @@ export default async function DepartmentPage() {
 
     console.log("All Departments:", Array.from(all_departments));
 
-    redirect(`/department/${Array.from(all_departments).filter(d => d.name !== "")[0]}`);
+    redirect(`/department/${Array.from(all_departments).filter(d => d.name !== "")[0].id}`);
 }

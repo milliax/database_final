@@ -60,6 +60,12 @@ export default function DoctorSummaryPage({
             >
                 <h2 className="font-bold mb-4">科別</h2>
                 <ul>
+                    <Link href={`/doctors`} passHref>
+                        <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
+                            selected === "" ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                            全部科別
+                        </li>
+                    </Link>
                     {departments.map(dep => (
                         <Link href={`/doctors/${dep.id}`} passHref key={dep.id}>
                             <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
