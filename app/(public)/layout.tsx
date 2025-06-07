@@ -15,6 +15,7 @@ export default function BeforeLoggedInLayout({
             {/* The children prop will render the content of the current route */}
             {/* You can also add a sidebar or other layout elements here */}
             {children}
+
         </React.Fragment>
     );
 }

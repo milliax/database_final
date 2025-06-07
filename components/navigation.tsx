@@ -36,6 +36,10 @@ export default function Navigation() {
                     />
                 </Link>
                 <div className="flex flex-row gap-3">
+                    <Link href="/department"
+                        className="text-slate-900 hover:text-slate-600 text-lg">
+                        科別
+                    </Link>
                     <Link href="/doctors"
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         認識本院
