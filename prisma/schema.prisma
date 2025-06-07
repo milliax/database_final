@@ -54,10 +54,10 @@ model User {
     id String @id @default(cuid())
 
     // username String  @unique
-    email    String? @unique 
+    email String? @unique
     // only admin and doctor using email for login
     // patient stored id number in email field
-    
+
     password String
 
     name    String?
@@ -100,6 +100,12 @@ model Patient {
 
     birth_date DateTime
     bio        String?
+
+    address String?
+    phone   String?
+
+    emergency_contact_name  String?
+    emergency_contact_phone String?
 
     id_card_number     String   @unique
     id_card_issue_date DateTime
@@ -196,7 +202,7 @@ model ConsultingRoom {
     status     ConsultingRoomStatus @default(PENDING)
     number_now Int                  @default(0) // current number in the room
 
-    max_consultation_number Int @default(50)// maximum number of consultations in the room
+    max_consultation_number Int @default(50) // maximum number of consultations in the room
 
     consultations Consultation[]
 
