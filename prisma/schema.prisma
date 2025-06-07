@@ -197,7 +197,7 @@ model ConsultingRoom {
     doctorId String
 
     slot Int // from 0 to 20, representing the slot number in the room
-    day  DateTime // the day of the consultation
+    day  DateTime @db.Date // the day of the consultation
 
     status     ConsultingRoomStatus @default(PENDING)
     number_now Int                  @default(0) // current number in the room

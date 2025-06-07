@@ -2,7 +2,8 @@ import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
-import bcrypt from "bcryptjs";
+
+import bcrypt from 'bcrypt'
 
 export const GET = async (req: NextRequest) => {
     try {

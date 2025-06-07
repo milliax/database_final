@@ -94,7 +94,7 @@ export default function CalendarMonth({
                 <div className="mt-10 text-center lg:w-80 lg:mt-9 bg-slate-50 py-3 rounded-md px-3 dark:bg-slate-800">
                     <div className="flex items-center text-gray-900">
                         <button type="button"
-                            className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-200 dark:hover:text-gray-50"
+                            className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-200 dark:hover:text-gray-50 cursor-pointer"
                             onClick={() => { toggleMonth(-1) }}
                         >
                             <span className="sr-only">Previous month</span>
@@ -102,7 +102,7 @@ export default function CalendarMonth({
                         </button>
                         <div className="flex-auto text-sm font-semibold text-black dark:text-white">{MonthInEng(selectedMonth)}</div>
                         <button type="button"
-                            className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-200 dark:hover:text-gray-50"
+                            className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-200 dark:hover:text-gray-50 cursor-pointer"
                             onClick={() => { toggleMonth(1) }}
                         >
                             <span className="sr-only">Next month</span>
@@ -155,13 +155,13 @@ export default function CalendarMonth({
                             </button>
                         ))}
                     </div>
-                    <button
+                    {/* <button
                         type="button"
                         className="mt-8 w-full cursor-pointer rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         onClick={() => { setReserve(true) }}
                     >
                         確定日期
-                    </button>
+                    </button> */}
                 </div>
 
             </div>
