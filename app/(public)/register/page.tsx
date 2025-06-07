@@ -50,7 +50,7 @@ export default function RegisterPage() {
                 confirmButtonText: '前往登入',
             }).then(() => {
                 setTimeout(() => {
-                    window.location.href = "/summary"; // Redirect to login page
+                    window.location.href = "/login"; // Redirect to login page
                 }, 100)
             })
 
@@ -77,27 +77,27 @@ export default function RegisterPage() {
                     <label className="w-32">姓名</label>
                     <input
                         type="text"
-                        placeholder="name"
+                        placeholder="姓名"
                         className="border rounded-md p-2 w-full"
                         required
                         ref={nameRef}
                     />
                 </div>
                 <div className="flex flex-row gap-3 items-center">
-                    <label className="w-32">出生年月日</label>
-                    <CalendarWithYear date={birthDay}
-                        setDate={setBirthDay}
-                    />
-                </div>
-                <div className="flex flex-row gap-3 items-center">
                     <label className="w-32">身分證字號</label>
                     <input
                         type="text"
-                        placeholder="id"
+                        placeholder="身分證字號"
                         className="border rounded-md p-2 w-full"
                         required
                         name="id"
                         ref={idRef}
+                    />
+                </div>
+                <div className="flex flex-row gap-3 items-center">
+                    <label className="w-32">出生年月日</label>
+                    <CalendarWithYear date={birthDay}
+                        setDate={setBirthDay}
                     />
                 </div>
                 <div className="flex flex-row gap-3 items-center">
@@ -108,7 +108,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="flex flex-col gap-3">
                     <label className="w-32">身分證換證地點</label>
-                    <select className="outline py-1 rounded-md" name="location" required defaultValue="none">
+                    <select className="outline py-1 rounded-md px-2" name="location" required defaultValue="none">
                         <option value="none" disabled>請選擇縣市</option>
                         <option value="北市">北市</option>
                         <option value="北縣">北縣</option>
@@ -150,16 +150,16 @@ export default function RegisterPage() {
                 </div>
                 <div className="flex flex-col gap-3">
                     <label className="w-32">身分證領補換類別</label>
-                    <div className="grid grid-cols-3 gap-3 bg-neutral-100 rounded-md p-3">
-                        <div className={clsx("w-full h-12 rounded-md flex flex-row items-center justify-center",
+                    <div className="grid grid-cols-3 gap-3 bg-neutral-100 rounded-md p-3 select-none">
+                        <div className={clsx("w-full h-12 rounded-md flex flex-row items-center justify-center cursor-pointer transition-all duration-200",
                             idType === 0 ? "bg-sky-300" : "bg-white")} onClick={() => {
                                 setIdType(0)
                             }}>初發</div>
-                        <div className={clsx("w-full h-12 rounded-md flex flex-row items-center justify-center",
+                        <div className={clsx("w-full h-12 rounded-md flex flex-row items-center justify-center cursor-pointer transition-all duration-200",
                             idType === 1 ? "bg-sky-300" : "bg-white")} onClick={() => {
                                 setIdType(1)
                             }}>補發</div>
-                        <div className={clsx("w-full h-12 rounded-md flex flex-row items-center justify-center",
+                        <div className={clsx("w-full h-12 rounded-md flex flex-row items-center justify-center cursor-pointer transition-all duration-200",
                             idType === 2 ? "bg-sky-300" : "bg-white")} onClick={() => {
                                 setIdType(2)
                             }}>換發</div>
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                     上傳身分證照片
                 </div> */}
                 <button type="submit"
-                    className={clsx("w-full h-12 rounded-md text-white",
+                    className={clsx("w-full h-12 rounded-md text-white cursor-pointer",
                         loading ? "bg-gray-400 cursor-not-allowed" : "bg-sky-500 hover:bg-sky-400")}
                     disabled={loading}>
                     {loading ? "註冊中..." : "註冊"}

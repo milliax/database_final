@@ -7,17 +7,22 @@ import bcrypt from 'bcrypt';
 
 import { addHours } from 'date-fns';
 
+import { validateTaiwanID } from '@/lib/id_verification';
+
 export const POST = async (req: NextRequest) => {
 
     try {
 
         const input_schema = z.object({
             name: z.string().min(1, "姓名為必填欄位"),
-            id: z.string().min(1, "身分證字號為必填欄位"),
             birth_date: z.string().min(1, "出生年月日為必填欄位"),
             issue_date: z.string().min(1, "發證日期為必填欄位"),
             location: z.string().min(1, "身分證換證地點為必填欄位"),
             issue_type: z.string().min(1, "身分證換證類型為必填欄位"),
+            id: z.string()
+                .min(1, "身分證字號為必填欄位")
+                // .regex(/^[A-Z][12]\d{8}$/, "身分證字號格式不正確")
+                .refine((id) => validateTaiwanID(id), "身分證字號驗證碼不正確"),
         })
 
         const body = await req.json();

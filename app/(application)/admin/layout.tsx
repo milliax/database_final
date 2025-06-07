@@ -19,12 +19,6 @@ export default async function AdminLayout({
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'ADMIN') {
         redirect('/'); // Redirect to unauthorized page if not admin
-
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <h1 className="text-2xl font-bold text-red-500">未授權存取</h1>
-            </div>
-        );
     }
 
     return (
