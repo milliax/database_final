@@ -1,6 +1,9 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import clsx from "clsx";
+import { numberInLetter } from "@/lib/utils";
 
 const departments = [
     { id: "internal", name: "內科" },
@@ -11,28 +14,36 @@ const departments = [
 const days = ["一", "二", "三", "四", "五", "六", "日"];
 const times = ["7:00-11:00", "13:00-17:00", "18:00-22:00"];
 
-const schedules: Record<string, string[][]> = {
-    internal: [
-        ["王醫師", "王醫師", "李醫師", "李醫師", "王醫師", "", ""],
-        ["李醫師", "王醫師", "王醫師", "李醫師", "王醫師", "", ""],
-        ["", "李醫師", "王醫師", "王醫師", "李醫師", "", ""],
-        ["", "", "", "", "", "", ""],
-    ],
-    surgery: [
-        ["陳醫師", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
-        ["", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
-        ["", "", "陳醫師", "陳醫師", "陳醫師", "", ""],
-        ["", "", "", "", "", "", ""],
-    ],
-    pediatrics: [
-        ["張醫師", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
-        ["", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
-        ["", "", "張醫師", "張醫師", "張醫師", "", ""],
-        ["", "", "", "", "", "", ""],
-    ],
-};
+// const schedules: Record<string, string[][]> = {
+// internal: [
+//     ["王醫師", "王醫師", "李醫師", "李醫師", "王醫師", "", ""],
+//     ["李醫師", "王醫師", "王醫師", "李醫師", "王醫師", "", ""],
+//     ["", "李醫師", "王醫師", "王醫師", "李醫師", "", ""],
+//     ["", "", "", "", "", "", ""],
+// ],
+//     surgery: [
+//         ["陳醫師", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
+//         ["", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
+//         ["", "", "陳醫師", "陳醫師", "陳醫師", "", ""],
+//         ["", "", "", "", "", "", ""],
+//     ],
+//     pediatrics: [
+//         ["張醫師", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
+//         ["", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
+//         ["", "", "張醫師", "張醫師", "張醫師", "", ""],
+//         ["", "", "", "", "", "", ""],
+//     ],
+// };
 
-export default function DepartmentPage() {
+export default function DepartmentPage({
+    departments,
+    schedules,
+    department_name,
+}: {
+    departments: string[],
+    schedules: string[][]
+    department_name: string
+}) {
     const [selected, setSelected] = useState("internal");
 
     return (
@@ -47,18 +58,17 @@ export default function DepartmentPage() {
                 <h2 className="font-bold mb-4">科別</h2>
                 <ul>
                     {departments.map(dep => (
-                        <li key={dep.id}>
-                            <button
-                                className={`w-full text-left px-3 py-2 rounded mb-2 ${selected === dep.id ? "bg-green-600 text-white" : "hover:bg-green-200"}`}
-                                onClick={() => setSelected(dep.id)}
-                            >
-                                {dep.name}
-                            </button>
-                        </li>
+                        <Link href={`/department/${encodeURI(dep)}`} passHref key={dep}>
+                            <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
+                                selected === dep ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                                {dep}
+                            </li>
+                        </Link>
                     ))}
                 </ul>
             </motion.div>
             {/* 右側班表動畫 */}
+
             <motion.div
                 key={selected}
                 className="flex-1 p-8"
@@ -67,8 +77,47 @@ export default function DepartmentPage() {
                 exit={{ x: 30, opacity: 0 }}
                 transition={{ duration: 1.2, type: "spring" }}
             >
-                <h1 className="text-2xl font-bold mb-6">{departments.find(d => d.id === selected)?.name} 班表</h1>
-                <div className="overflow-x-auto">
+                <h1 className="text-2xl font-bold mb-6">{department_name} 班表</h1>
+                <div className="grid grid-cols-8 gap-5 divide-y divide-gray-600">
+                    <div />
+                    {Array.from({ length: 7 }).map((_, rowIdx) => (
+                        <div key={rowIdx} className="text-center font-semibold">
+                            {numberInLetter(rowIdx)}
+                        </div>
+                    ))}
+
+                    {schedules.map((slot, index) => {
+                        if (index % 7 === 0) {
+                            return (
+                                <React.Fragment key={index}>
+                                    <div >
+                                        {index === 0 && "7:00-11:00"}
+                                        {index === 7 && "13:00-17:00"}
+                                        {index === 14 && "18:00-22:00"}
+                                    </div>
+                                    <div key={index} className="text-center font-semibold flex flex-col gap-1">
+                                        {slot.map((doctor, colIdx) => (
+                                            <div key={doctor}>
+                                                {doctor}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </React.Fragment>
+                            )
+                        }
+
+                        return (
+                            <div key={index} className="text-center font-semibold flex flex-col gap-1">
+                                {slot.map((doctor, colIdx) => (
+                                    <div key={doctor}>
+                                        {doctor}
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })}
+                </div>
+                {/* <div className="overflow-x-auto">
                     <table className="min-w-full border border-gray-300">
                         <thead>
                             <tr>
@@ -84,14 +133,14 @@ export default function DepartmentPage() {
                                     <td className="border px-4 py-2 font-semibold bg-gray-50">{time}</td>
                                     {days.map((_, colIdx) => (
                                         <td key={colIdx} className="border px-4 py-2 text-center">
-                                            {schedules[selected][rowIdx]?.[colIdx] || ""}
+                                            {schedules[rowIdx]?.[colIdx] || ""}
                                         </td>
                                     ))}
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
+                </div> */}
             </motion.div>
         </div>
     );

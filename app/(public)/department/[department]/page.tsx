@@ -29,13 +29,17 @@ const schedules: Record<string, string[][]> = {
     ],
 };
 
-import { redirect } from "next/navigation";
-
 import { prisma } from "@/lib/prisma";
 
-import ClientPage from "./client_page"
+import ClientPage from "../client_page"
 
-export default async function DepartmentPage() {
+export default async function DepartmentPage({
+    params,
+}: {
+    params: Promise<{ department: string }>
+}) {
+    const p = await params;
+    const department = decodeURI(p.department);
 
     const doctors = await prisma.doctor.findMany({
         select: {
@@ -61,23 +65,37 @@ export default async function DepartmentPage() {
         }
     })
 
-    console.log(doctors);
-
     const all_departments: Set<string> = new Set()
 
     doctors.forEach(doctor => {
         all_departments.add(doctor.department?.name ?? "")
     })
 
-    console.log("All Departments:", Array.from(all_departments));
 
-    redirect(`/department/${Array.from(all_departments).filter(d => d !== "")[0]}`);
+    const doctorInThisDepartment = doctors.filter((d) => d.department?.name === department);
+
+
+    let schedules: string[][] = [];
+
+    for (let i = 0; i < 21; i++) {
+        schedules.push([])
+    }
+
+    for (const doctor of doctorInThisDepartment) {
+        const slots = doctor.schedules[0]?.slots || [];
+
+        slots.forEach((slot, index) => {
+            if (slot) {
+                schedules[index].push(doctor.user?.name ?? "");
+            }
+        })
+    }
 
     return (
         <ClientPage
             departments={Array.from(all_departments).filter(d => d !== "")}
-            schedules={[[]]}
-            department_name="全部醫師"
+            schedules={schedules}
+            department_name={department}
         />
     );
 }

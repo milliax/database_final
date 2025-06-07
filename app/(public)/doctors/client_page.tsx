@@ -3,6 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { motion } from "framer-motion";
+import { useState } from "react";
+import clsx from "clsx";
+
 export default function DoctorSummaryPage({
     doctors,
     departments,
@@ -12,6 +16,8 @@ export default function DoctorSummaryPage({
     doctors: any[]
     department_name: string
 }) {
+    const [selected, setSelected] = useState("internal");
+
     // console.log(doctors)
 
     // const departmentNames = new Set(doctors.map(d => d.department?.name ?? ""));
@@ -28,8 +34,8 @@ export default function DoctorSummaryPage({
     // const doctorInThisDepartment = doctors.filter((d) => encodeURI(d.department?.name ?? "") === department);
 
     return (
-        <section className="w-full flex flex-row p-5 max-w-6xl mx-auto">
-            <ul className="w-40 text-center text-2xl mb-6 flex flex-col gap-2">
+        <section className="flex min-h-screen">
+            {/* <ul className="w-40 text-center text-2xl mb-6 flex flex-col gap-2">
                 <Link href={`/doctors`} passHref>
                     <li className="block text-green-700 hover:text-green-900 bg-white rounded-md w-full border ">
                         全部醫師
@@ -42,52 +48,81 @@ export default function DoctorSummaryPage({
                         </li>
                     </Link>
                 ))}
-            </ul>
-            <div className="w-3/5 mx-auto px-4 py-10">
-                <h1 className="text-3xl font-bold text-center text-green-700 mb-6">{department_name}</h1>
-                {doctors.map((d) => {
-                    // console.log(d.doctor.bio)
-                    const b = d.bio || "";
+            </ul> */}
+            <motion.div
+                className="w-48 bg-gray-100 p-6"
+                initial={{ x: -30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 1.2, type: "spring" }}
+            >
+                <h2 className="font-bold mb-4">科別</h2>
+                <ul>
+                    {departments.map(dep => (
+                        <Link href={`/doctors/${encodeURI(dep)}`} passHref key={dep}>
+                            <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
+                                selected === dep ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                                {dep}
+                            </li>
+                        </Link>
+                    ))}
+                </ul>
+            </motion.div>
 
-                    const blocks = b.split("\n").filter((block: any) => block.trim() !== "");
+            <motion.div
+                key={selected}
+                className="flex-1 p-8"
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 30, opacity: 0 }}
+                transition={{ duration: 1.2, type: "spring" }}
+            >
+                <h1 className="text-2xl font-bold mb-6">{department_name}</h1>
+                <div className="overflow-x-auto">
+                    {doctors.map((d) => {
+                        // console.log(d.doctor.bio)
+                        const b = d.bio || "";
 
-                    return (
-                        <div key={d.id} className="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-200">
-                            <div className="flex flex-col md:flex-row items-center gap-6">
-                                <div className="w-40 h-40 relative rounded-full overflow-hidden border border-gray-300">
-                                    <Image src={d.user.image || "/images/default-doctor.jpg"} alt={d.user.name ?? "anonnymous"} fill className="object-cover" />
-                                </div>
-                                <div className="flex-1">
-                                    <h2 className="text-2xl font-semibold text-green-800">主治醫師：{d.user.name}</h2>
-                                    {blocks.map((block: any, index: number) => {
-                                        if (block.startsWith("(") && block.endsWith(")")) {
-                                            return (
-                                                <h3 key={index} className="mt-2 text-black text-2xl">
-                                                    {block.slice(1, -1)}
-                                                </h3>
-                                            );
-                                        }
-                                        return (
-                                            <p key={index} className="mt-2 text-gray-700 text-lg">
-                                                {block}
-                                            </p>
-                                        );
-                                    })}
-                                    <div className="mt-4 flex justify-end">
-                                        <Link
-                                            href={`/doctor/${d.id}`}
-                                            className="text-xl px-6 py-2 rounded-full bg-yellow-400 text-black hover:bg-green-800 hover:text-white transition hover:scale-110 duration-75"
-                                        >
-                                            我要預約
-                                        </Link>
+                        const blocks = b.split("\n").filter((block: any) => block.trim() !== "");
+
+                        return (
+                            <div key={d.id} className="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-200">
+                                <div className="flex flex-col md:flex-row items-center gap-6">
+                                    <div className="w-40 h-40 relative rounded-full overflow-hidden border border-gray-300">
+                                        <Image src={d.user.image || "/images/default-doctor.jpg"} alt={d.user.name ?? "anonnymous"} fill className="object-cover" />
                                     </div>
-                                    <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
+                                    <div className="flex-1">
+                                        <h2 className="text-2xl font-semibold text-green-800">主治醫師：{d.user.name}</h2>
+                                        {blocks.map((block: any, index: number) => {
+                                            if (block.startsWith("(") && block.endsWith(")")) {
+                                                return (
+                                                    <h3 key={index} className="mt-2 text-black text-2xl">
+                                                        {block.slice(1, -1)}
+                                                    </h3>
+                                                );
+                                            }
+                                            return (
+                                                <p key={index} className="mt-2 text-gray-700 text-lg">
+                                                    {block}
+                                                </p>
+                                            );
+                                        })}
+                                        <div className="mt-4 flex justify-end">
+                                            <Link
+                                                href={`/doctor/${d.id}`}
+                                                className="text-xl px-6 py-2 rounded-full bg-yellow-400 text-black hover:bg-green-800 hover:text-white transition hover:scale-110 duration-75"
+                                            >
+                                                我要預約
+                                            </Link>
+                                        </div>
+                                        {/* TODO: datetime error hydration */}
+                                        <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
-                })}
-            </div>
+                        )
+                    })}
+                </div>
+            </motion.div>
         </section>
     );
 }

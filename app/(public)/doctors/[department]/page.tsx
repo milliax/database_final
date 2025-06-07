@@ -56,7 +56,7 @@ export default async function DoctorSummaryPage({
 
     return (
         <ClientPage
-            departments={Array.from(departmentNames)}
+            departments={Array.from(departmentNames).filter(d => d !== "")}
             doctors={doctorInThisDepartment}
             department_name={decodeURI(department)}
         />
