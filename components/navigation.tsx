@@ -77,7 +77,7 @@ export default function Navigation() {
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         認識本院
                     </Link>
-                    <Link href="/doctors"
+                    <Link href="/department"
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         門診時間
                     </Link>
