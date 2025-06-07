@@ -73,7 +73,8 @@ export default async function DoctorSummaryPage({
             id: department
         },
         select: {
-            name: true
+            name: true,
+            id: true,
         }
     });
 
@@ -93,6 +94,7 @@ export default async function DoctorSummaryPage({
             departments={departments}
             doctors={doctorInThisDepartment}
             department_name={department_name.name}
+            department_id={department_name.id}
         />
     );
 }

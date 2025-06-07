@@ -77,7 +77,8 @@ export default async function DepartmentPage({
             id: department
         },
         select: {
-            name: true
+            name: true,
+            id: true,
         }
     });
 
@@ -86,6 +87,7 @@ export default async function DepartmentPage({
             departments={departments}
             schedules={schedules}
             department_name={department_name?.name || "未知科別"}
+            department_id={department_name?.id || ""}
         />
     );
 }

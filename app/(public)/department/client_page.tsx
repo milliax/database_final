@@ -4,32 +4,13 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import clsx from "clsx";
 import { numberInLetter } from "@/lib/utils";
-
-// const schedules: Record<string, string[][]> = {
-// internal: [
-//     ["王醫師", "王醫師", "李醫師", "李醫師", "王醫師", "", ""],
-//     ["李醫師", "王醫師", "王醫師", "李醫師", "王醫師", "", ""],
-//     ["", "李醫師", "王醫師", "王醫師", "李醫師", "", ""],
-//     ["", "", "", "", "", "", ""],
-// ],
-//     surgery: [
-//         ["陳醫師", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
-//         ["", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
-//         ["", "", "陳醫師", "陳醫師", "陳醫師", "", ""],
-//         ["", "", "", "", "", "", ""],
-//     ],
-//     pediatrics: [
-//         ["張醫師", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
-//         ["", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
-//         ["", "", "張醫師", "張醫師", "張醫師", "", ""],
-//         ["", "", "", "", "", "", ""],
-//     ],
-// };
+import { usePathname } from "next/navigation";
 
 export default function DepartmentPage({
     departments,
     schedules,
     department_name,
+    department_id,
 }: {
     departments: {
         name: string,
@@ -37,8 +18,10 @@ export default function DepartmentPage({
     }[]
     schedules: string[][]
     department_name: string
+    department_id: string
 }) {
-    const [selected, setSelected] = useState("internal");
+    const pathname = usePathname()
+    const selected_id = pathname.split("/").pop() || "";
 
     return (
         <div className="flex min-h-screen">
@@ -54,7 +37,7 @@ export default function DepartmentPage({
                     {departments.map(dep => (
                         <Link href={`/department/${dep.id}`} passHref key={dep.id}>
                             <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
-                                selected === dep.id ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                                selected_id === dep.id ? "bg-green-600 text-white" : "hover:bg-green-200")}>
                                 {dep.name}
                             </li>
                         </Link>
@@ -64,7 +47,7 @@ export default function DepartmentPage({
             {/* 右側班表動畫 */}
 
             <motion.div
-                key={selected}
+                key={selected_id}
                 className="flex-1 p-8"
                 initial={{ x: 30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}

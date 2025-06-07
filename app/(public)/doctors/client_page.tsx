@@ -6,11 +6,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 export default function DoctorSummaryPage({
     doctors,
     departments,
     department_name,
+    department_id,
 }: {
     departments: {
         name: string,
@@ -18,8 +20,10 @@ export default function DoctorSummaryPage({
     }[]
     doctors: any[]
     department_name: string
+    department_id: string
 }) {
-    const [selected, setSelected] = useState("internal");
+    const pathname = usePathname()
+    const selected_department = pathname.split("/").pop() || "";
 
     // console.log(doctors)
 
@@ -62,14 +66,14 @@ export default function DoctorSummaryPage({
                 <ul>
                     <Link href={`/doctors`} passHref>
                         <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
-                            selected === "" ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                            selected_department === "doctors" ? "bg-green-600 text-white" : "hover:bg-green-200")}>
                             全部科別
                         </li>
                     </Link>
                     {departments.map(dep => (
                         <Link href={`/doctors/${dep.id}`} passHref key={dep.id}>
                             <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
-                                selected === dep.name ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                                selected_department === dep.id ? "bg-green-600 text-white" : "hover:bg-green-200")}>
                                 {dep.name}
                             </li>
                         </Link>
@@ -78,7 +82,7 @@ export default function DoctorSummaryPage({
             </motion.div>
 
             <motion.div
-                key={selected}
+                key={selected_department}
                 className="flex-1 p-8"
                 initial={{ x: 30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
