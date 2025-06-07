@@ -5,152 +5,152 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-    provider = "prisma-client-js"
-    output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
-    ADMIN
-    DOCTOR
-    PATIENT
+  ADMIN
+  DOCTOR
+  PATIENT
 }
 
 enum ConsultingRoomStatus {
-    PENDING
-    IN_PROGRESS
-    COMPLETED
+  PENDING
+  IN_PROGRESS
+  COMPLETED
 }
 
 enum ConsultationStatus {
-    PENDING
+  PENDING
 
-    CHECKED_IN
+  CHECKED_IN
 
-    IN_PROGRESS
-    COMPLETED
+  IN_PROGRESS
+  COMPLETED
 
-    NO_SHOW
+  NO_SHOW
 
-    CANCELLED
+  CANCELLED
 }
 
 enum AppointmentStatus {
-    PENDING
-    CHECKED_IN
-    IN_PROGRESS
-    COMPLETED
-    NO_SHOW
-    CANCELLED
+  PENDING
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  NO_SHOW
+  CANCELLED
 }
 
 model User {
-    // account for a user signable
-    id String @id @default(cuid())
+  // account for a user signable
+  id String @id @default(cuid())
 
-    // username String  @unique
-    email String? @unique
-    // only admin and doctor using email for login
-    // patient stored id number in email field
+  // username String  @unique
+  email String? @unique
+  // only admin and doctor using email for login
+  // patient stored id number in email field
 
-    password String
+  password String
 
-    name    String?
-    phone   String?
-    address String?
+  name    String?
+  phone   String?
+  address String?
 
-    emailVerified DateTime?
-    image         String?
-    sessions      Session[]
+  emailVerified DateTime?
+  image         String?
+  sessions      Session[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    // custom fields below
-    role    Role     @default(PATIENT)
-    doctor  Doctor?
-    patient Patient?
+  // custom fields below
+  role    Role     @default(PATIENT)
+  doctor  Doctor?
+  patient Patient?
 }
 
 model Session {
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Patient {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    email String? @unique
+  email String? @unique
 
-    // custom fields below
+  // custom fields below
 
-    birth_date DateTime
-    bio        String?
+  birth_date DateTime
+  bio        String?
 
-    address String?
-    phone   String?
+  address String?
+  phone   String?
 
-    emergency_contact_name  String?
-    emergency_contact_phone String?
+  emergency_contact_name  String?
+  emergency_contact_phone String?
 
-    id_card_number     String   @unique
-    id_card_issue_date DateTime
-    id_card_location   String
-    id_card_issue_type String
+  id_card_number     String   @unique
+  id_card_issue_date DateTime
+  id_card_location   String
+  id_card_issue_type String
 
-    id_card_image String?
+  id_card_image String?
 
-    consultations Consultation[]
+  consultations Consultation[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Doctor {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    // custom fields below
-    bio String?
+  // custom fields below
+  bio String?
 
-    schedules Schedule[]
+  schedules Schedule[]
 
-    consultingRooms ConsultingRoom[]
+  consultingRooms ConsultingRoom[]
 
-    createdAt    DateTime    @default(now())
-    updatedAt    DateTime    @updatedAt
-    department   Department? @relation(fields: [departmentId], references: [id])
-    departmentId String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
 }
 
 model Schedule {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    doctorId String
-    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
-    // custom fields below
-    startTime DateTime // start time of the schedule
-    slots     Int[] // number of slots available for the day
+  // custom fields below
+  startTime DateTime // start time of the schedule
+  slots     Int[] // number of slots available for the day
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // model Consultation {
@@ -191,74 +191,74 @@ model Schedule {
 // }
 
 model ConsultingRoom {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-    doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctorId String
 
-    slot Int // from 0 to 20, representing the slot number in the room
-    day  DateTime @db.Date // the day of the consultation
+  slot Int // from 0 to 20, representing the slot number in the room
+  day  DateTime @db.Date // the day of the consultation
 
-    status     ConsultingRoomStatus @default(PENDING)
-    number_now Int                  @default(0) // current number in the room
+  status     ConsultingRoomStatus @default(PENDING)
+  number_now Int                  @default(0) // current number in the room
 
-    max_consultation_number Int @default(50) // maximum number of consultations in the room
+  max_consultation_number Int @default(50) // maximum number of consultations in the room
 
-    consultations Consultation[]
+  consultations Consultation[]
 
-    feedback   Feedback? @relation(fields: [feedbackId], references: [id])
-    feedbackId String?   @unique
+  feedback   Feedback? @relation(fields: [feedbackId], references: [id])
+  feedbackId String?   @unique
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    // composition index
-    @@unique([doctorId, day, slot])
+  // composition index
+  @@unique([doctorId, day, slot])
 }
 
 model Consultation {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-    patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String
 
-    description  String?
-    prescription String?
+  description  String?
+  prescription String?
 
-    appointmentStatus AppointmentStatus  @default(PENDING)
-    consultingStatus  ConsultationStatus @default(PENDING)
+  appointmentStatus AppointmentStatus  @default(PENDING)
+  consultingStatus  ConsultationStatus @default(PENDING)
 
-    updatedAt        DateTime        @updatedAt
-    createdAt        DateTime        @default(now())
-    ConsultingRoom   ConsultingRoom? @relation(fields: [consultingRoomId], references: [id])
-    consultingRoomId String?
-    Feedback         Feedback[]
+  updatedAt        DateTime        @updatedAt
+  createdAt        DateTime        @default(now())
+  ConsultingRoom   ConsultingRoom? @relation(fields: [consultingRoomId], references: [id])
+  consultingRoomId String?
+  Feedback         Feedback[]
 }
 
 model Feedback {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    consultation   Consultation? @relation(fields: [consultationId], references: [id])
-    consultationId String?
+  consultation   Consultation? @relation(fields: [consultationId], references: [id])
+  consultationId String?
 
-    rating  Int?
-    comment String?
+  rating  Int?
+  comment String?
 
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime         @updatedAt
-    ConsultingRoom ConsultingRoom[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ConsultingRoom ConsultingRoom[]
 }
 
 model Department {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    name String @unique
+  name String @unique
 
-    // custom fields below
-    description String?
+  // custom fields below
+  description String?
 
-    doctors Doctor[]
+  doctors Doctor[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
