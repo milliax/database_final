@@ -48,13 +48,6 @@ export default function Navigation() {
                     />
                 </Link>
                 <div className="flex flex-row gap-3">
-<<<<<<< HEAD
-                    <Link href="/department"
-                        className="text-slate-900 hover:text-slate-600 text-lg">
-                        科別
-                    </Link>
-                    <Link href="/hospital"
-=======
                     <div
                         className="relative"
                         onMouseEnter={handleMouseEnter}
@@ -81,7 +74,6 @@ export default function Navigation() {
                         )}
                     </div>
                     <Link href="/doctors"
->>>>>>> 26742bc22af957dbe97be90ed66e01f3d3130eec
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         認識本院
                     </Link>
