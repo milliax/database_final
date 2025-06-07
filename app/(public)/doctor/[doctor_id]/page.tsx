@@ -51,7 +51,7 @@ export default async function DoctorDetailPage({
                     <div className="mt-4 text-sm text-gray-500">資料更新日期: {updatedAt ? new Date(updatedAt).toLocaleDateString() : "無"}</div>
                 </div>
             </div>
-            <ReservePart />
+            <ReservePart doctor_id={doctor_id}/>
         </div>
     );
 }

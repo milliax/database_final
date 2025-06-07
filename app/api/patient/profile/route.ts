@@ -33,3 +33,7 @@ export const GET = async (req: NextRequest) => {
         return NextResponse.json({ error: "Failed to fetch patient profile" }, { status: 500 });
     }
 }
+
+export const PUT = async (req: NextRequest) => {
+    
+}

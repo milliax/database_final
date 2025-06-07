@@ -38,6 +38,10 @@ async function main() {
             name: "醫生",
             password: hashedPassword,
             role: "DOCTOR",
+
+            doctor: {
+                create: {}
+            }
         }
     })
 
@@ -54,6 +58,10 @@ async function main() {
             name: "醫者",
             password: hashedPassword,
             role: "DOCTOR",
+
+            doctor: {
+                create: {}
+            }
         }
     })
 
