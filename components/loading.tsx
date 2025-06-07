@@ -6,7 +6,7 @@ export const LoadingCircle = ({
     strokeWidth = 10,
 }: {
     color?: "BLUE" | "PURPLE" | "ORANGE" | "RED",
-    scale?: "XL" | "LG" | "MD" | "SM"
+    scale?: "XL" | "LG" | "MD" | "SM" | "XS"
     strokeWidth?: number
 }) => {
     const colorMap = {
@@ -17,7 +17,7 @@ export const LoadingCircle = ({
     };
 
     return (
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-full w-full">
             {/* <svg
                 className={clsx("animate-spin", {
                     "text-blue-500": color === "BLUE",
@@ -50,6 +50,7 @@ export const LoadingCircle = ({
                     "h-20 w-20": scale === "LG",
                     "h-16 w-16": scale === "MD",
                     "h-12 w-12": scale === "SM",
+                    "h-8 w-8": scale === "XS",
                 })}
                 fill={colorMap[color]}
             // xml:space="preserve"
