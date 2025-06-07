@@ -15,50 +15,51 @@ import Link from 'next/link';
 
 export default function AdminNavigation() {
     return (
-        <NavigationMenu className='w-full'>
+        <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>醫生管理</NavigationMenuTrigger>
+                    <NavigationMenuTrigger className="cursor-pointer">醫生管理</NavigationMenuTrigger>
 
                     <NavigationMenuContent>
-                        <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-
-                            <Link href="/admin/doctor/detail" className="text-slate-900 hover:text-slate-600">
-                                <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center">
-                                    醫生資料
-                                </NavigationMenuLink>
+                        <ul className="grid w-[10rem] gap-2 place-items-center">
+                            <Link href="/admin/doctor/detail" className="text-slate-900 hover:text-slate-600 text-center w-32">
+                                {/* <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center"> */}
+                                醫生資料
+                                {/* </NavigationMenuLink> */}
                             </Link>
-                            <Link href="/admin/doctor/rearrange" className="text-slate-900 hover:text-slate-600">
-                                <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center">
-                                    代班
-                                </NavigationMenuLink>
+                            <Link href="/admin/doctor/rearrange" className="text-slate-900 hover:text-slate-600 text-center w-32">
+                                {/* <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center"> */}
+                                代班
+                                {/* </NavigationMenuLink> */}
                             </Link>
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>病患管理</NavigationMenuTrigger>
+                    <NavigationMenuTrigger className="cursor-pointer">病患管理</NavigationMenuTrigger>
 
                     <NavigationMenuContent>
-                        <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                        <ul className="grid w-[10rem] gap-2 place-items-center">
                             <Link href="/admin/patient/history" className="text-slate-900 hover:text-slate-600">
-                                <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center">
-                                    病歷管理
-                                </NavigationMenuLink>
+                                {/* <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center"> */}
+                                病歷管理
+                                {/* </NavigationMenuLink> */}
                             </Link>
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>報表</NavigationMenuTrigger>
+                    <NavigationMenuTrigger className="cursor-pointer">報表</NavigationMenuTrigger>
                     <NavigationMenuContent>
-                        <Link href="/admin/report/chart" className="text-slate-900 hover:text-slate-600">
-                            <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center">
+                        <ul className="grid w-[10rem] gap-2 place-items-center">
+                            <Link href="/admin/report/chart" className="text-slate-900 hover:text-slate-600">
+                                {/* <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center"> */}
                                 季度報告
-                            </NavigationMenuLink>
-                        </Link>
+                                {/* </NavigationMenuLink> */}
+                            </Link>
+                        </ul>
                         {/* <NavigationMenuLink></NavigationMenuLink> */}
                     </NavigationMenuContent>
                 </NavigationMenuItem>
