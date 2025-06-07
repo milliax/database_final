@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 type Reservation = {
     id: string;
@@ -29,7 +30,7 @@ export default function ReservationHistoryPage() {
                 setReservations(
                     data.reservations.sort((a: Reservation, b: Reservation) => b.date.localeCompare(a.date))
                 );
-                if (data.userName) setUserName(data.userName); // 這裡抓 API 回傳的 userName
+                if (data.userName) setUserName(data.userName);
             });
     }, []);
 
@@ -54,13 +55,23 @@ export default function ReservationHistoryPage() {
 
     return (
         <div className="max-w-2xl mx-auto py-10 px-4">
-            <h1 className="text-4xl font-bold text-center mb-8 tracking-widest">
+            <motion.h1
+                className="text-4xl font-bold text-center mb-6 tracking-widest bg-gray-100 py-8 shadow-md"
+                initial={{ opacity: 0, y: -40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7 }}
+            >
                 預約紀錄
-            </h1>
-            <div className="mb-6 text-2xl">
+            </motion.h1>
+            <motion.div
+                className="mb-6 text-2xl"
+                initial={{ opacity: 0, x: -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+            >
                 <span className="font-semibold">姓名：</span>
                 <span>{userName}</span>
-            </div>
+            </motion.div>
             {showSuccess && (
                 <div className="fixed inset-0 flex items-center justify-center bg-transparent z-50">
                     <div className="bg-white border border-gray-400 text-black px-8 py-6 rounded shadow text-2xl font-bold">
@@ -70,18 +81,26 @@ export default function ReservationHistoryPage() {
             )}
             <div className="space-y-4">
                 {reservations.length === 0 ? (
-                    <div className="text-3xl text-center text-gray-400 py-8">
+                    <motion.div
+                        className="text-3xl text-center text-gray-400 py-8"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.7, delay: 0.4 }}
+                    >
                         沒有預約紀錄
-                    </div>
+                    </motion.div>
                 ) : (
                     reservations.map((r, idx) => {
                         const isFuture = r.date > today;
                         const isPast = r.date < today;
                         return (
-                            <div
+                            <motion.div
                                 key={r.id || idx}
                                 className={`rounded-xl shadow p-5 flex flex-col gap-2 border relative min-h-[140px] transition-all duration-300
-                ${isPast ? "bg-gray-100" : "bg-white"}`}
+                                    ${isPast ? "bg-gray-100" : "bg-white"}`}
+                                initial={{ opacity: 0, y: 40 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.2 + idx * 0.08 }}
                             >
                                 <div className="ml-2">
                                     <div>
@@ -195,7 +214,7 @@ export default function ReservationHistoryPage() {
                                         </div>
                                     </div>
                                 )}
-                            </div>
+                            </motion.div>
                         );
                     })
                 )}

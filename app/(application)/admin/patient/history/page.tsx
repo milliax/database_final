@@ -12,6 +12,7 @@ export default function AdminSchedulePage() {
     const [loading, setLoading] = useState<boolean>(false);
 
     const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
+    const [openIdx, setOpenIdx] = useState<number | null>(null);
 
     const handleSearch = async () => {
         if (searchParam.trim() === "") {
@@ -56,7 +57,6 @@ export default function AdminSchedulePage() {
     return (
         <div className="flex flex-col items-center min-h-screen bg-gray-100">
             <h1 className="text-2xl font-bold mb-4 w-full text-center">病歷紀錄</h1>
-
             <div className="mb-4 flex flex-col w-full items-center">
                 <form onSubmit={(e) => {
                     e.preventDefault();
@@ -93,12 +93,58 @@ export default function AdminSchedulePage() {
                                 selectedPatient === null ? "w-full" : "w-2/5",
                             )}>
                                 {patientHistory.map((history, index) => (
-                                    <li key={history.id} className="p-4 bg-white rounded-lg shadow-md cursor-pointer" onClick={() => {
-                                        setSelectedPatient(history.id);
-                                    }}>
+                                    <li key={history.id} className="p-4 bg-white rounded-lg shadow-md cursor-pointer relative"
+                                        onClick={() => setSelectedPatient(history.id)}>
                                         <h2 className="text-lg font-semibold">{history.name}</h2>
                                         <p className="text-gray-600">身份證字號: {history.patient.id_card_number}</p>
                                         <p className="text-gray-500 text-sm">日期: {history.patient.consultations.length === 0 ? "尚未看診" : new Date(history.patient.consultations[0].createdAt).toLocaleDateString()}</p>
+                                        <button
+                                            className="absolute right-4 bottom-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setOpenIdx(openIdx === index ? null : index);
+                                            }}
+                                        >
+                                            {openIdx === index ? "收合" : "詳細資料"}
+                                        </button>
+                                        {openIdx === index && (
+                                            <div className="mt-4 p-4 bg-gray-50 rounded border border-gray-200">
+                                                {history.patient.consultations.length === 0 ? (
+                                                    <div>尚未看診</div>
+                                                ) : (
+                                                    history.patient.consultations
+                                                        .sort((a: Consultation, b: Consultation) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                                                        .map((consultation: Consultation, cidx: number) => (
+                                                            <div key={consultation.id} className="mb-4 border-b last:border-b-0 pb-4 last:pb-0">
+                                                                <div className="mb-1 text-sm text-gray-500">
+                                                                    看診日期：{new Date(consultation.createdAt).toLocaleDateString()}
+                                                                </div>
+                                                                <div className="mb-1">
+                                                                    <span className="font-semibold">詳細資料：</span>
+                                                                    {consultation.description || "無"}
+                                                                </div>
+                                                                <div className="mb-1">
+                                                                    <span className="font-semibold">醫院開藥：</span>
+                                                                    {consultation.prescription || "無"}
+                                                                </div>
+                                                                <div className="mb-1">
+                                                                    <span className="font-semibold">回饋：</span>
+                                                                    {consultation.Feedback && consultation.Feedback.length > 0
+                                                                        ? consultation.Feedback[0].comment || "無"
+                                                                        : "無"}
+                                                                </div>
+                                                                <div>
+                                                                    <span className="font-semibold">評分：</span>
+                                                                    {consultation.Feedback && consultation.Feedback.length > 0 && consultation.Feedback[0].rating
+                                                                        ? "★".repeat(consultation.Feedback[0].rating)
+                                                                        : "無"}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                )}
+                                            </div>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
@@ -150,3 +196,16 @@ const HistoryConsultations = ({
         </React.Fragment>
     );
 }
+
+type Feedback = {
+    comment?: string;
+    rating?: number;
+};
+
+type Consultation = {
+    id: string;
+    createdAt: string;
+    description?: string;
+    prescription?: string;
+    Feedback?: Feedback[];
+};
