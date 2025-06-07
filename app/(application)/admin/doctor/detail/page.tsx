@@ -139,7 +139,7 @@ const EditDoctorForm = ({
                 setDoctor(data);
                 console.log(data)
 
-                setBio(data?.doctor?.bio || "");
+                setBio(data.doctor.bio || "");
                 setName(data.name || "");
                 setDepartment(data.doctor.department?.name || "");
                 setImageURL(data.image || "");
@@ -395,7 +395,7 @@ const EditPhoto = ({
 
     const attachImages = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-
+        
         if (!files || !files[0]) return;
 
         const imageBlob = URL.createObjectURL(files[0]);

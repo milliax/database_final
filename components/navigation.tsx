@@ -80,6 +80,10 @@ export default function Navigation() {
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         門診時間
                     </Link>
+                    <Link href="/patientbio"
+                        className="text-slate-900 hover:text-slate-600 text-lg">
+                        我的資料
+                    </Link>
                 </div>
             </div>
             <div className="flex flex-row gap-5">
