@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 const departments = [
     { id: "internal", name: "內科" },
@@ -10,7 +11,6 @@ const departments = [
 const days = ["一", "二", "三", "四", "五", "六", "日"];
 const times = ["7:00-11:00", "13:00-17:00", "18:00-22:00"];
 
-// 假資料：departmentId -> [row][col]
 const schedules: Record<string, string[][]> = {
     internal: [
         ["王醫師", "王醫師", "李醫師", "李醫師", "王醫師", "", ""],
@@ -37,8 +37,13 @@ export default function DepartmentPage() {
 
     return (
         <div className="flex min-h-screen">
-            {/* 左側選單 */}
-            <div className="w-48 bg-gray-100 p-6">
+            {/* 左側選單動畫 */}
+            <motion.div
+                className="w-48 bg-gray-100 p-6"
+                initial={{ x: -30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 1.2, type: "spring" }}
+            >
                 <h2 className="font-bold mb-4">科別</h2>
                 <ul>
                     {departments.map(dep => (
@@ -52,9 +57,16 @@ export default function DepartmentPage() {
                         </li>
                     ))}
                 </ul>
-            </div>
-            {/* 右側班表 */}
-            <div className="flex-1 p-8">
+            </motion.div>
+            {/* 右側班表動畫 */}
+            <motion.div
+                key={selected}
+                className="flex-1 p-8"
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 30, opacity: 0 }}
+                transition={{ duration: 1.2, type: "spring" }}
+            >
                 <h1 className="text-2xl font-bold mb-6">{departments.find(d => d.id === selected)?.name} 班表</h1>
                 <div className="overflow-x-auto">
                     <table className="min-w-full border border-gray-300">
@@ -80,7 +92,7 @@ export default function DepartmentPage() {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }
