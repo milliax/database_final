@@ -43,6 +43,10 @@ CREATE TABLE "Patient" (
     "email" TEXT,
     "birth_date" TIMESTAMP(3) NOT NULL,
     "bio" TEXT,
+    "address" TEXT,
+    "phone" TEXT,
+    "emergency_contact_name" TEXT,
+    "emergency_contact_phone" TEXT,
     "id_card_number" TEXT NOT NULL,
     "id_card_issue_date" TIMESTAMP(3) NOT NULL,
     "id_card_location" TEXT NOT NULL,
@@ -83,9 +87,10 @@ CREATE TABLE "ConsultingRoom" (
     "id" TEXT NOT NULL,
     "doctorId" TEXT NOT NULL,
     "slot" INTEGER NOT NULL,
-    "day" TIMESTAMP(3) NOT NULL,
+    "day" DATE NOT NULL,
     "status" "ConsultingRoomStatus" NOT NULL DEFAULT 'PENDING',
     "number_now" INTEGER NOT NULL DEFAULT 0,
+    "max_consultation_number" INTEGER NOT NULL DEFAULT 50,
     "feedbackId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -151,9 +156,6 @@ CREATE UNIQUE INDEX "Doctor_userId_key" ON "Doctor"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ConsultingRoom_feedbackId_key" ON "ConsultingRoom"("feedbackId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "ConsultingRoom_doctorId_day_slot_key" ON "ConsultingRoom"("doctorId", "day", "slot");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Department_name_key" ON "Department"("name");
