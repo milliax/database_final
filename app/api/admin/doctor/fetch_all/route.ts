@@ -18,6 +18,9 @@ export const GET = async () => {
             include: {
                 doctor: true
             },
+            orderBy: {
+                createdAt: 'asc',
+            }
         });
 
         return NextResponse.json(doctors);
