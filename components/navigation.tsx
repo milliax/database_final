@@ -14,6 +14,8 @@ export default function Navigation() {
 
     const { data: session, status } = useSession();
     const [user, setUser] = useState<any>(null);
+    const [open, setOpen] = useState(false);
+    const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (status === "authenticated") {
@@ -22,6 +24,16 @@ export default function Navigation() {
             setUser(null);
         }
     }, [session, status]);
+
+    const handleMouseEnter = () => {
+        if (timer) clearTimeout(timer);
+        setOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        const t = setTimeout(() => setOpen(false), 150); // 150ms 延遲
+        setTimer(t);
+    };
 
     return (
         <nav className="w-full flex flex-row h-16 bg-slate-50 justify-between gap-5 items-center pr-5">
@@ -36,13 +48,46 @@ export default function Navigation() {
                     />
                 </Link>
                 <div className="flex flex-row gap-3">
+<<<<<<< HEAD
                     <Link href="/department"
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         科別
                     </Link>
                     <Link href="/hospital"
+=======
+                    <div
+                        className="relative"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        <button className="text-slate-900 hover:text-slate-600 text-lg">
+                            我要預約
+                        </button>
+                        {open && (
+                            <div className="absolute left-0 mt-2 w-32 bg-white border rounded shadow z-10">
+                                <Link
+                                    href="/department"
+                                    className="block px-4 py-2 text-slate-900 hover:bg-slate-100"
+                                >
+                                    預約
+                                </Link>
+                                <Link
+                                    href="/reservation/history"
+                                    className="block px-4 py-2 text-slate-900 hover:bg-slate-100"
+                                >
+                                    預約紀錄
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                    <Link href="/doctors"
+>>>>>>> 26742bc22af957dbe97be90ed66e01f3d3130eec
                         className="text-slate-900 hover:text-slate-600 text-lg">
                         認識本院
+                    </Link>
+                    <Link href="/doctors"
+                        className="text-slate-900 hover:text-slate-600 text-lg">
+                        門診時間
                     </Link>
                 </div>
             </div>
