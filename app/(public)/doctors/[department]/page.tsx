@@ -1,8 +1,3 @@
-
-
-import Image from "next/image";
-import Link from "next/link";
-
 import { prisma } from "@/lib/prisma";
 
 import ClientPage from "../client_page";
@@ -33,6 +28,7 @@ export default async function DoctorSummaryPage({
             department: {
                 select: {
                     name: true,
+                    id: true
                 }
             }
         }
@@ -41,7 +37,12 @@ export default async function DoctorSummaryPage({
     console.log("Doctors:", doctors);
     // console.log(doctors)
 
-    const departmentNames = new Set(doctors.map(d => d.department?.name ?? ""));
+    const departmentNames = new Set(doctors.map(d => ({
+        // d.department?.name ?? "",
+        name: d.department?.name ?? "",
+        id: d.department?.id ?? ""
+    })));
+
     let doctorsByDepartment: { [key: string]: any[] } = {};
 
     doctors.forEach((doctor) => {
@@ -56,7 +57,7 @@ export default async function DoctorSummaryPage({
 
     return (
         <ClientPage
-            departments={Array.from(departmentNames).filter(d => d !== "")}
+            departments={Array.from(departmentNames).filter(d => d.name !== "")}
             doctors={doctorInThisDepartment}
             department_name={decodeURI(department)}
         />

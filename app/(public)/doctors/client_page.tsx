@@ -12,7 +12,10 @@ export default function DoctorSummaryPage({
     departments,
     department_name,
 }: {
-    departments: string[]
+    departments: {
+        name: string,
+        id: string
+    }[]
     doctors: any[]
     department_name: string
 }) {
@@ -58,10 +61,10 @@ export default function DoctorSummaryPage({
                 <h2 className="font-bold mb-4">科別</h2>
                 <ul>
                     {departments.map(dep => (
-                        <Link href={`/doctors/${encodeURI(dep)}`} passHref key={dep}>
+                        <Link href={`/doctors/${dep.id}`} passHref key={dep.id}>
                             <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
-                                selected === dep ? "bg-green-600 text-white" : "hover:bg-green-200")}>
-                                {dep}
+                                selected === dep.name ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                                {dep.name}
                             </li>
                         </Link>
                     ))}

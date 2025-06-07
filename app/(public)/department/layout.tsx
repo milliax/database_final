@@ -8,7 +8,6 @@ export default function DoctorLayout({
     return (
         <React.Fragment>
             {children}
-            
         </React.Fragment>
     );
 }

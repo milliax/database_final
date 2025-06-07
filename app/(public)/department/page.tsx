@@ -1,34 +1,3 @@
-
-const departments = [
-    { id: "internal", name: "內科" },
-    { id: "surgery", name: "外科" },
-    { id: "pediatrics", name: "小兒科" },
-];
-
-const days = ["一", "二", "三", "四", "五", "六", "日"];
-const times = ["7:00-11:00", "13:00-17:00", "18:00-22:00"];
-
-const schedules: Record<string, string[][]> = {
-    internal: [
-        ["王醫師", "王醫師", "李醫師", "李醫師", "王醫師", "", ""],
-        ["李醫師", "王醫師", "王醫師", "李醫師", "王醫師", "", ""],
-        ["", "李醫師", "王醫師", "王醫師", "李醫師", "", ""],
-        ["", "", "", "", "", "", ""],
-    ],
-    surgery: [
-        ["陳醫師", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
-        ["", "陳醫師", "陳醫師", "陳醫師", "陳醫師", "", ""],
-        ["", "", "陳醫師", "陳醫師", "陳醫師", "", ""],
-        ["", "", "", "", "", "", ""],
-    ],
-    pediatrics: [
-        ["張醫師", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
-        ["", "張醫師", "張醫師", "張醫師", "張醫師", "", ""],
-        ["", "", "張醫師", "張醫師", "張醫師", "", ""],
-        ["", "", "", "", "", "", ""],
-    ],
-};
-
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
@@ -47,6 +16,7 @@ export default async function DepartmentPage() {
             department: {
                 select: {
                     name: true,
+                    id: true
                 }
             },
             schedules: {
@@ -61,23 +31,13 @@ export default async function DepartmentPage() {
         }
     })
 
-    console.log(doctors);
-
-    const all_departments: Set<string> = new Set()
-
-    doctors.forEach(doctor => {
-        all_departments.add(doctor.department?.name ?? "")
-    })
+    const all_departments = new Set(doctors.map(d => ({
+        // d.department?.name ?? "",
+        name: d.department?.name ?? "",
+        id: d.department?.id ?? ""
+    })));
 
     console.log("All Departments:", Array.from(all_departments));
 
-    redirect(`/department/${Array.from(all_departments).filter(d => d !== "")[0]}`);
-
-    return (
-        <ClientPage
-            departments={Array.from(all_departments).filter(d => d !== "")}
-            schedules={[[]]}
-            department_name="全部醫師"
-        />
-    );
+    redirect(`/department/${Array.from(all_departments).filter(d => d.name !== "")[0]}`);
 }

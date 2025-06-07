@@ -5,15 +5,6 @@ import Link from "next/link";
 import clsx from "clsx";
 import { numberInLetter } from "@/lib/utils";
 
-const departments = [
-    { id: "internal", name: "內科" },
-    { id: "surgery", name: "外科" },
-    { id: "pediatrics", name: "小兒科" },
-];
-
-const days = ["一", "二", "三", "四", "五", "六", "日"];
-const times = ["7:00-11:00", "13:00-17:00", "18:00-22:00"];
-
 // const schedules: Record<string, string[][]> = {
 // internal: [
 //     ["王醫師", "王醫師", "李醫師", "李醫師", "王醫師", "", ""],
@@ -40,7 +31,10 @@ export default function DepartmentPage({
     schedules,
     department_name,
 }: {
-    departments: string[],
+    departments: {
+        name: string,
+        id: string
+    }[]
     schedules: string[][]
     department_name: string
 }) {
@@ -58,10 +52,10 @@ export default function DepartmentPage({
                 <h2 className="font-bold mb-4">科別</h2>
                 <ul>
                     {departments.map(dep => (
-                        <Link href={`/department/${encodeURI(dep)}`} passHref key={dep}>
+                        <Link href={`/department/${dep.id}`} passHref key={dep.id}>
                             <li className={clsx("w-full text-left px-3 py-2 rounded mb-2",
-                                selected === dep ? "bg-green-600 text-white" : "hover:bg-green-200")}>
-                                {dep}
+                                selected === dep.id ? "bg-green-600 text-white" : "hover:bg-green-200")}>
+                                {dep.name}
                             </li>
                         </Link>
                     ))}
