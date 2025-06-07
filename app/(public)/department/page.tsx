@@ -49,7 +49,7 @@ export default function DepartmentPage() {
                     {departments.map(dep => (
                         <li key={dep.id}>
                             <button
-                                className={`w-full text-left px-3 py-2 rounded mb-2 ${selected === dep.id ? "bg-green-600 text-white" : "hover:bg-green-100"}`}
+                                className={`w-full text-left px-3 py-2 rounded mb-2 ${selected === dep.id ? "bg-green-600 text-white" : "hover:bg-green-200"}`}
                                 onClick={() => setSelected(dep.id)}
                             >
                                 {dep.name}
