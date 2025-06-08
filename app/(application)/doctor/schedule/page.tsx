@@ -5,6 +5,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { clsx } from "clsx";
 import { LoadingCircle } from "@/components/loading";
 import { date } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 
 // 假設你有取得登入醫生的 id
 // 實際專案請用 session 或 context 取得 doctorId
@@ -48,7 +49,7 @@ export default function DoctorSchedulePage() {
 
     const today = new Date();
     const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 6);
 
     // console.log("Start of the week:", startDayOfWeek);
 
@@ -149,7 +150,7 @@ export default function DoctorSchedulePage() {
 
             {slotSelected !== null && (
                 <div className="flex flex-col items-center mt-10 gap-3">
-                    <h2 className="text-4xl font-semibold">病患名單</h2>
+                    <h2 className="text-4xl font-semibold ">病患名單</h2>
 
                     <PatientInfo slot={slotSelected} />
                 </div>
@@ -173,13 +174,14 @@ const CellBody = ({
 }) => {
     return (
         <div className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md",
-            isAvailable ? "bg-slate-600" : "bg-slate-100")} onClick={() => {
-                if (isAvailable) {
-                    setSlotSelected && setSlotSelected(index);
-                }
-            }} >
+            isAvailable ? (slotSelected === index ? "bg-green-700" : "bg-slate-600") : "bg-slate-100",
+        )} onClick={() => {
+            if (isAvailable) {
+                setSlotSelected && setSlotSelected(index);
+            }
+        }} >
             {isAvailable && (
-                <span className="text-sm text-white cursor-pointer">{isAvailable ? "病患名單" : ""}</span>
+                <span className="text-sm text-white cursor-pointer ">{isAvailable ? "病患名單" : ""}</span>
             )}
         </div>
     )
@@ -198,15 +200,13 @@ const PatientInfo = ({
 
     let dateSelected: Date | null = null;
 
-    const now = new Date();
-    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+    const now = new Date()
+    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() - 6);
     const todayWithoutTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // console.log("start day of week, ", startDayOfWeek);
 
-    const slotIdx = Math.floor(slot / 7); // 0:早 1:午 2:晚
-    const dayIdx = slot % 7; // 0~6
-    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + dayIdx);
+    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + slot % 7);
 
     if (dateSelected < todayWithoutTime) {
         dateSelected = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 7);
@@ -221,8 +221,8 @@ const PatientInfo = ({
             const response = await fetch(`/api/doctor/schedule/patients`, {
                 method: "POST",
                 body: JSON.stringify({
-                    date: dateSelected,
-                    slot: slotIdx
+                    date: dateSelected, // 假設你要查詢今天的病患名單
+                    slot: slot
                 })
             });
 
@@ -239,14 +239,15 @@ const PatientInfo = ({
         }
     }
 
+    // 取得病患歷史紀錄
     const fetchHistory = async (patientId: string) => {
         setHistoryLoading(true);
         setDetailPatientId(patientId);
         try {
-            const res = await fetch(`/api/doctor/patient-history?doctorId=${doctorId}&patientId=${patientId}`);
+            const res = await fetch(`/api/doctor/patient-history?patientId=${patientId}`);
             const data = await res.json();
             setHistory(data.history || []);
-        } catch (e) {
+        } catch {
             setHistory([]);
         } finally {
             setHistoryLoading(false);
@@ -262,7 +263,6 @@ const PatientInfo = ({
             <h3 className="text-2xl font-semibold mb-4 text-center">
                 時段：{dateSelected.toLocaleDateString()} {slot < 7 ? "早班" : (slot < 14) ? "午班" : "晚班"}
             </h3>
-            {/* 這裡可以顯示更多病患資訊 */}
             {loading ? (
                 <div className="flex items-center justify-center h-40">
                     <LoadingCircle color="BLUE" scale="SM" />
@@ -274,7 +274,7 @@ const PatientInfo = ({
                             <table className="min-w-full border border-gray-300 rounded-lg">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="px-4 py-2 border-b">號碼</th>
+                                        <th className="px-4 py-2 border-b">#</th>
                                         <th className="px-4 py-2 border-b">姓名</th>
                                         <th className="px-4 py-2 border-b">Email</th>
                                         <th className="px-4 py-2 border-b">電話</th>
@@ -307,32 +307,65 @@ const PatientInfo = ({
                 </React.Fragment>
             )}
 
-            {/* 詳細資料彈窗或展開 */}
+            {/* 懸浮視窗顯示歷史紀錄 */}
             {detailPatientId && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl p-8 min-w-[350px] max-w-lg">
-                        <div className="flex justify-between items-center mb-4">
-                            <h4 className="text-xl font-bold">歷史看診紀錄</h4>
-                            <button onClick={() => setDetailPatientId(null)} className="text-gray-500 hover:text-black">關閉</button>
-                        </div>
-                        {historyLoading ? (
-                            <div className="text-center py-8">載入中...</div>
-                        ) : history.length === 0 ? (
-                            <div className="text-gray-500 py-8">無歷史紀錄</div>
-                        ) : (
-                            <ul className="space-y-3 max-h-80 overflow-y-auto">
-                                {history.map((item, idx) => (
-                                    <li key={idx} className="border-b pb-2">
-                                        <div>日期：{new Date(item.createdAt).toLocaleDateString()}</div>
-                                        <div>描述：{item.description || "無"}</div>
-                                        <div>處方：{item.prescription || "無"}</div>
-                                        <div>評分：{item.rating ?? "無"}</div>
-                                        <div>評論：{item.comment ?? "無"}</div>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
+                <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <AnimatePresence>
+                        <motion.div
+                            key="modal"
+                            initial={{ opacity: 0, scale: 0.8, y: 60 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: 60 }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 25,
+                                bounce: 0.35,
+                                duration: 0.4,
+                            }}
+                            className="bg-white rounded-2xl shadow-2xl p-8 min-w-[350px] max-w-lg"
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="text-xl font-bold">歷史看診紀錄</h4>
+                                <button
+                                    onClick={() => setDetailPatientId(null)}
+                                    className="text-gray-500 hover:text-black text-lg"
+                                >
+                                    關閉
+                                </button>
+                            </div>
+                            {historyLoading ? (
+                                <div className="text-center py-8">載入中...</div>
+                            ) : history.length === 0 ? (
+                                <div className="text-gray-500 py-8">無歷史紀錄</div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full border border-gray-300 rounded-lg text-sm">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="px-2 py-1 border-b">日期</th>
+                                                <th className="px-2 py-1 border-b">描述</th>
+                                                <th className="px-2 py-1 border-b">處方</th>
+                                                <th className="px-2 py-1 border-b">評分</th>
+                                                <th className="px-2 py-1 border-b">評論</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {history.map((item, idx) => (
+                                                <tr key={idx} className="hover:bg-green-50">
+                                                    <td className="px-2 py-1 border-b">{new Date(item.createdAt).toLocaleDateString()}</td>
+                                                    <td className="px-2 py-1 border-b">{item.description || "無"}</td>
+                                                    <td className="px-2 py-1 border-b">{item.prescription || "無"}</td>
+                                                    <td className="px-2 py-1 border-b">{item.rating ?? "無"}</td>
+                                                    <td className="px-2 py-1 border-b">{item.comment ?? "無"}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             )}
         </div >

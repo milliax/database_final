@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ConsultingRoomStatus } from "@/generated/prisma";
 import { LoadingCircle } from "@/components/loading";
+import Swal from "sweetalert2";
+import clsx from "clsx";
+
+import TextareaAutosize from "react-textarea-autosize";
 
 export default function DoctorClinicPage({
     roomId,
@@ -27,13 +31,15 @@ export default function DoctorClinicPage({
 
     // 取得診間狀態
     const fetchClinicStatus = async () => {
-        setLoading(true);
+        // setLoading(true);
         const res = await fetch(`/api/doctor/clinic/${roomId}`);
         const data = await res.json();
         console.log(data)
+
         setCurrentNumber(data.number_now);
         setCurrentPatient(data.currentPatient);
-        setQueue(data.queue);
+
+        setQueue(data.consultations);
         setDescription(data.currentPatient?.description || "");
         setPrescription(data.currentPatient?.prescription || "");
         setLoading(false);
@@ -45,35 +51,82 @@ export default function DoctorClinicPage({
 
     // 叫下一號
     const nextPatient = async () => {
-        await fetch("/api/clinic/next", { method: "POST" });
+        const res = await fetch(`/api/doctor/clinic/${roomId}/next`);
+
+        if (!res.ok) {
+            const result = await res.json();
+
+            if (result.error === "No consultations found") {
+                Swal.fire({
+                    icon: "info",
+                    title: "沒有候診病人",
+                    text: "目前沒有病人需要看診。",
+                })
+            }
+        }
+
         fetchClinicStatus();
     };
 
     // 儲存病歷
-    const saveRecord = async () => {
-        await fetch("/api/clinic/record", {
+    const saveRecord = async (id: string) => {
+        const res = await fetch(`/api/doctor/clinic/consultation/${id}/update`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                patientId: currentPatient?.id,
                 description,
                 prescription,
             }),
         });
+
+        if (!res.ok) {
+            const result = await res.json();
+            console.log(result)
+            Swal.fire({
+                icon: "error",
+                title: "儲存失敗",
+                text: result.error?.[0].message || "無法儲存病歷，請稍後再試。",
+            });
+            return;
+        }
         fetchClinicStatus();
     };
 
     // 狀態切換
-    const handleStatus = (id: string, status: string) => {
+    const handleStatus = async (id: string, status: string) => {
         setPatientStatus(prev => ({ ...prev, [id]: status }));
-        // 這裡可加呼叫後端 API 更新狀態
+
+        if (status === "consulting") {
+            // TODO: 看診中
+
+        } else if (status === "checked_in") {
+
+            const res = await fetch(`/api/doctor/clinic/consultation/${id}/check_in`)
+            if (!res.ok) {
+                const result = await res.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "報到失敗",
+                    text: result.error || "無法完成報到，請稍後再試。",
+                });
+                return;
+            }
+            fetchClinicStatus();
+        }
     };
 
     // 結束看診
     const endClinic = async () => {
-        // 呼叫 API 將所有未報到的病人標記為未到
-        await fetch("/api/clinic/end", { method: "POST" });
-        router.push("/doctor");
+        const res = await fetch(`/api/doctor/clinic/${roomId}/end`);
+        if (res.ok) {
+            router.push("/doctor");
+            return;
+        }
+        Swal.fire({
+            icon: "error",
+            title: "結束看診失敗",
+            text: "無法結束看診，請稍後再試。",
+        })
     };
 
     // 新增：進入頁面先詢問是否開始看診
@@ -162,7 +215,7 @@ export default function DoctorClinicPage({
                         <div className="text-lg text-gray-500 mb-2">目前號碼</div>
                         <div className="text-6xl font-bold text-green-700">{currentNumber}</div>
                         <button
-                            className="mt-4 bg-green-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-green-700 transition active:scale-95"
+                            className="mt-4 bg-green-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-green-700 transition active:scale-95 cursor-pointer"
                             onClick={nextPatient}
                         >
                             叫下一號
@@ -173,31 +226,38 @@ export default function DoctorClinicPage({
                         <div className="text-lg font-semibold text-gray-700 mb-2">即將來的病人</div>
                         <ul className="space-y-2">
                             {queue && queue.length > 0 ? (
-                                queue.map((p) => (
-                                    <li key={p.id} className="bg-green-100 rounded px-4 py-2 flex items-center justify-between">
+                                queue.map((consultation, idx) => (
+                                    <li key={consultation.id} className={clsx("rounded px-4 py-2 flex items-center justify-between",
+                                        consultation.consultingStatus === "PENDING" ? "bg-green-100" : (
+                                            consultation.consultingStatus === "IN_PROGRESS" ? "bg-blue-100" : (
+                                                consultation.consultingStatus === "COMPLETED" ? "bg-green-300" : "bg-red-100"
+                                            ))
+                                    )}>
                                         <div>
-                                            <span className="font-semibold">{p.name}</span>
-                                            <span className="ml-4 text-gray-500">號碼 {p.number}</span>
+                                            <span className="font-semibold">{consultation.patient.user.name}</span>
+                                            <span className="ml-4 text-gray-500">號碼 {idx + 1}</span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button
+                                            {consultation.consultingStatus === "PENDING" && (
+                                                <button
+                                                    className={`px-3 py-1 rounded text-sm transition cursor-pointer 
+                                                    ${patientStatus[consultation.id] === "checked_in"
+                                                            ? "bg-blue-700 text-white"
+                                                            : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                                                    onClick={() => handleStatus(consultation.id, "checked_in")}
+                                                >
+                                                    報到
+                                                </button>
+                                            )}
+                                            {/* <button
                                                 className={`px-3 py-1 rounded text-sm transition 
-                                                    ${patientStatus[p.id] === "checked_in"
-                                                        ? "bg-blue-700 text-white"
-                                                        : "bg-blue-500 text-white hover:bg-blue-600"}`}
-                                                onClick={() => handleStatus(p.id, "checked_in")}
-                                            >
-                                                報到
-                                            </button>
-                                            <button
-                                                className={`px-3 py-1 rounded text-sm transition 
-                                                    ${patientStatus[p.id] === "consulting"
+                                                    ${patientStatus[consultation.id] === "consulting"
                                                         ? "bg-green-700 text-white"
                                                         : "bg-green-500 text-white hover:bg-green-600"}`}
-                                                onClick={() => handleStatus(p.id, "consulting")}
+                                                onClick={() => handleStatus(consultation.id, "consulting")}
                                             >
                                                 看診
-                                            </button>
+                                            </button> */}
                                         </div>
                                     </li>
                                 ))
@@ -208,28 +268,34 @@ export default function DoctorClinicPage({
                     </div>
                 </div>
                 {/* 下方：當前病患資訊 */}
-                {currentPatient && (
+                {currentNumber !== 0 && (
                     <div className="mt-8">
-                        <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{currentPatient.name}</div>
+                        <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{queue[currentNumber - 1].patient.user.name}</div>
                         <div className="mb-4">
                             <label className="block text-gray-600 mb-1">病情描述</label>
-                            <textarea
+                            <TextareaAutosize
                                 className="w-full border rounded p-2"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
+                                placeholder="請輸入病情描述"
+                                cols={3}
                             />
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-600 mb-1">處方</label>
-                            <textarea
+                            <TextareaAutosize
                                 className="w-full border rounded p-2"
                                 value={prescription}
                                 onChange={(e) => setPrescription(e.target.value)}
+                                placeholder="請輸入處方內容"
+                                cols={3}
                             />
                         </div>
                         <button
-                            className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition"
-                            onClick={saveRecord}
+                            className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition cursor-pointer"
+                            onClick={() => {
+                                saveRecord(queue[currentNumber - 1].id);
+                            }}
                         >
                             儲存
                         </button>
@@ -238,7 +304,7 @@ export default function DoctorClinicPage({
             </div>
             {/* 右下角結束看診按鈕 */}
             <button
-                className="fixed bottom-10 right-10 bg-red-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-red-700 transition active:scale-95 z-50"
+                className="fixed bottom-10 right-10 bg-red-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-red-700 transition active:scale-95 z-50 cursor-pointer"
                 onClick={() => setShowEndConfirm(true)}
             >
                 結束看診
@@ -256,13 +322,13 @@ export default function DoctorClinicPage({
                         </div>
                         <div className="flex gap-6 mt-4">
                             <button
-                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 cursor-pointer"
                                 onClick={endClinic}
                             >
                                 是
                             </button>
                             <button
-                                className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
+                                className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500 cursor-pointer"
                                 onClick={() => setShowEndConfirm(false)}
                             >
                                 否
