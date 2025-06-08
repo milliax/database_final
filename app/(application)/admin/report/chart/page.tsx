@@ -10,7 +10,7 @@ type DoctorStatsMap = {
 };
 
 export default function AdminReportChartPage() {
-    const [data, setData] = useState<{
+    const [report, setReport] = useState<{
         yesterday: Stats;
         lastWeek: Stats;
         doctors: DoctorStatsMap;
@@ -20,21 +20,14 @@ export default function AdminReportChartPage() {
     const [doctorName, setDoctorName] = useState("");
     const [doctorResult, setDoctorResult] = useState<{ yesterday: Stats; lastWeek: Stats } | null>(null);
 
-    useEffect(() => {
-        fetch("/api/admin/report/summary")
-            .then(res => res.json())
-            .then(setData);
-    }, []);
-
-    if (!data) {
-        return <div className="text-center py-20 text-xl">載入中...</div>;
-    }
-
-    const current = doctorResult ? doctorResult[selected] : data[selected];
+    const current: Stats = doctorResult
+        ? doctorResult[selected]
+        : report![selected];
 
     const handleDoctorSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        const found = data.doctors[doctorName.trim()];
+        if (!report) return;
+        const found = report.doctors[doctorName.trim()];
         if (doctorName.trim() && found) {
             setDoctorResult(found);
         } else {
@@ -42,6 +35,20 @@ export default function AdminReportChartPage() {
             alert("查無此醫生資料");
         }
     };
+
+    useEffect(() => {
+        fetch("/api/admin/report/summary")
+            .then(res => res.json())
+            .then(setReport);
+    }, []);
+
+    const [search, setSearch] = useState("");
+    const doctors = report?.doctors ? Object.entries(report.doctors) : [];
+    const filteredDoctors = doctors.filter(([name]) => name.includes(search));
+
+    if (!report) {
+        return <div className="text-center py-20 text-xl">載入中...</div>;
+    }
 
     return (
         <div className="max-w-2xl mx-auto py-10 flex flex-col gap-8">
@@ -111,6 +118,37 @@ export default function AdminReportChartPage() {
                         <span className="ml-2 text-2xl">★</span>
                     </div>
                 </div>
+            </div>
+            {/* 醫生報表 */}
+            <div className="mt-8">
+                <div className="mb-4 flex gap-2">
+                    <input
+                        className="border rounded px-2 py-1"
+                        placeholder="搜尋醫生姓名"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+                </div>
+                <table className="min-w-full border border-gray-300 rounded-lg">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="px-4 py-2 border-b">醫生姓名</th>
+                            <th className="px-4 py-2 border-b">{selected === "yesterday" ? "昨天" : "上週"}總預約數</th>
+                            <th className="px-4 py-2 border-b">{selected === "yesterday" ? "昨天" : "上週"}未到率</th>
+                            <th className="px-4 py-2 border-b">{selected === "yesterday" ? "昨天" : "上週"}平均評分</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredDoctors.map(([name, stat]) => (
+                            <tr key={name}>
+                                <td className="px-4 py-2 border-b">{name}</td>
+                                <td className="px-4 py-2 border-b">{stat[selected].totalReservations}</td>
+                                <td className="px-4 py-2 border-b">{(stat[selected].noShowRate * 100).toFixed(1)}%</td>
+                                <td className="px-4 py-2 border-b">{stat[selected].avgRating}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
