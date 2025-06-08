@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 
 export default function PatientBioPage() {
     const { data: session, status } = useSession();
+
     const [bio, setBio] = useState("");
     const [name, setName] = useState("");
     const [birthDate, setBirthDate] = useState("");
@@ -112,12 +113,12 @@ export default function PatientBioPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
+        <div className="bg-gradient-to-br from-green-50 via-white to-green-100">
             <motion.div
                 initial={{ opacity: 0, x: 100 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7 }}
-                className="relative max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-12 mt-10"
+                className="relative max-w-2xl mx-auto shadow-xl rounded-2xl p-12"
             >
                 {/* 中左大圓形證件照 */}
                 <div className="flex items-center mb-8">
