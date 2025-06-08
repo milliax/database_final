@@ -224,6 +224,7 @@ const PatientInfo = ({
                 throw new Error("Failed to fetch patients");
             }
             const data = await response.json();
+            console.log(data)
             setPatients(data.patients || []);
         } catch (error) {
             console.error("Error fetching patients:", error);
@@ -250,7 +251,7 @@ const PatientInfo = ({
                         <ul className="list-disc pl-5">
                             {patients.map((patient, index) => (
                                 <li key={index} className="text-sm text-gray-700">
-                                    {patient.name} - {patient.condition}
+                                    {patient.patient.user.name} - {patient.patient.user.email} - {patient.patient.user.phone}
                                 </li>
                             ))}
                         </ul>

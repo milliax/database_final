@@ -24,7 +24,6 @@ export const POST = async (req: NextRequest) => {
 
         
         if (!p.success) {
-
             return new Response(JSON.stringify({ error: "無效的請求格式" }), { status: 400 })
         }
 
@@ -59,7 +58,11 @@ export const POST = async (req: NextRequest) => {
             include: {
                 consultations: {
                     include: {
-                        patient: true
+                        patient: {
+                            include:{
+                                user: true,
+                            },
+                        }
                     }
                 }
             }
