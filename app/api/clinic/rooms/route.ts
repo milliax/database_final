@@ -14,7 +14,7 @@ export const GET = async (req: NextRequest) => {
 
     try {
         const today = addHours(new Date(), 0);
-        const start_of_day = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const start_of_day = addDays(new Date(today.getFullYear(), today.getMonth(), today.getDate()), 1);
 
         // read doctor's schema
 
@@ -110,11 +110,7 @@ export const GET = async (req: NextRequest) => {
 
                 day: {
                     gte: start_of_day,
-                },
-                OR: [
-                    { status: "PENDING" },
-                    { status: "IN_PROGRESS" },
-                ]
+                }
             },
             take: 5,
             orderBy: [

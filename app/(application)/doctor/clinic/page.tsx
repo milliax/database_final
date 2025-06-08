@@ -72,20 +72,30 @@ export default function DoctorClinicPage() {
                                     <h3>{room.roomId}</h3>
                                     <p>門診日期: {Math.floor(room.slot / 7) === 0 ? "7:00 ~ 11:00" : (Math.floor(room.slot / 7) === 1 ? "13:00 ~ 17:00" : "18:00 ~ 22:00")}</p>
                                     <p>門診時間: {new Date(room.day).toLocaleDateString()}</p>
-                                    <p>星期: {numberInLetter((new Date(room.day).getDay()) % 7)}</p>
+                                    <p>星期: {numberInLetter(((new Date(room.day).getDay()) + 6) % 7)}</p>
                                 </div>
-                                <button
-                                    className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
-                                    onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
-                                >
-                                    開始看診
-                                </button>
+                                <div className="flex flex-col gap-2">
+                                    {room.status === "COMPLETED" &&
+                                        <button
+                                            className="px-4 py-2 rounded bg-red-500 text-white transition-colors cursor-not-allowed"
+                                        // onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
+                                        >
+                                            已看完ㄌ
+                                        </button>
+                                    }
+                                    <button
+                                        className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
+                                        onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
+                                    >
+                                        開始看診
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </React.Fragment>
                 )}
             </div>
-            
+
         </div>
     );
 }
