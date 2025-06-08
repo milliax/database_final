@@ -25,16 +25,15 @@ export const POST = async (req: NextRequest) => {
 
         console.log(`reservation id: `, id)
 
-        const res = await prisma.consultation.delete({
-            where: {
-                id,
-            },
+        await prisma.consultation.update({
+            where: { id },
+            data: { appointmentStatus: "CANCELLED" },
         });
 
-        return NextResponse.json({})
+        return NextResponse.json({ ok: true })
     } catch (error) {
         console.error('Error in reservation cancellation:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ ok: false, error: String(error) }, { status: 500 });
     }
 
 }
