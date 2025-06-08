@@ -41,7 +41,7 @@ export default function ReservationHistoryPage() {
             .then(res => res.json())
             .then(data => {
                 setReservations(
-                    data.reservations.sort((a: Reservation, b: Reservation) => b.date.localeCompare(a.date))
+                    data.reservations.sort((a: Reservation, b: Reservation) => a.date.localeCompare(b.date))
                 );
                 console.log("reservations", data.reservations);
                 if (data.userName) setUserName(data.userName);
