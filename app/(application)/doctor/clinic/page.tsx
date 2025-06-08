@@ -4,14 +4,6 @@ import { numberInLetter } from "@/lib/utils";
 import React, { useState, useEffect } from "react";
 
 export default function DoctorClinicPage() {
-    // const clinicRooms = [
-    //     { roomId: 1, slot: 1, date: "2024-01-01" },
-    //     { roomId: 2, slot: 0, date: "2024-01-02" },
-    //     { roomId: 3, slot: 2, date: "2024-01-03" },
-    //     { roomId: 4, slot: 2, date: "2024-01-04" },
-    //     { roomId: 5, slot: 0, date: "2024-01-05" },
-    // ];
-
     const [currentDate, setCurrentDate] = useState("");
 
     const [loading, setLoading] = useState(true);
