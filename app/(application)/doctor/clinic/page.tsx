@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DoctorClinicPage() {
     const [loading, setLoading] = useState(true);
@@ -9,6 +10,9 @@ export default function DoctorClinicPage() {
     const [prescription, setPrescription] = useState("");
     const [queue, setQueue] = useState<any[]>([]);
     const [patientStatus, setPatientStatus] = useState<{ [id: string]: string }>({});
+    const [confirm, setConfirm] = useState(false);
+
+    const router = useRouter();
 
     // 取得診間狀態
     const fetchClinicStatus = async () => {
@@ -24,8 +28,8 @@ export default function DoctorClinicPage() {
     };
 
     useEffect(() => {
-        fetchClinicStatus();
-    }, []);
+        if (confirm) fetchClinicStatus();
+    }, [confirm]);
 
     // 叫下一號
     const nextPatient = async () => {
@@ -52,6 +56,61 @@ export default function DoctorClinicPage() {
         setPatientStatus(prev => ({ ...prev, [id]: status }));
         // 這裡可加呼叫後端 API 更新狀態
     };
+
+    // 新增：進入頁面先詢問是否開始看診
+    if (!confirm) {
+        // 取得現在日期與時段
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+        const hour = now.getHours();
+        let shift = "";
+        let shiftTime = "";
+        if (hour >= 7 && hour < 11) {
+            shift = "早班";
+            shiftTime = "7:00-11:00";
+        } else if (hour >= 13 && hour < 17) {
+            shift = "午班";
+            shiftTime = "13:00-17:00";
+        } else if (hour >= 18 && hour < 22) {
+            shift = "晚班";
+            shiftTime = "18:00-22:00";
+        } else {
+            shift = "非看診時段";
+            shiftTime = "";
+        }
+
+        return (
+            <div
+                className="fixed inset-0 flex items-center justify-center z-50"
+                style={{ background: "rgba(0,0,0,0.5)" }}
+            >
+                <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-6 min-w-[320px]">
+                    <h2 className="text-xl font-bold mb-2">是否開始看診？</h2>
+                    <div className="text-gray-700 text-lg mb-2">
+                        <span className="font-semibold">{dateStr}</span>
+                    </div>
+                    <div className="text-gray-700 text-lg mb-4">
+                        <span className="font-semibold">{shift}</span>
+                        {shiftTime && <span className="ml-2 text-sm text-gray-500">({shiftTime})</span>}
+                    </div>
+                    <div className="flex gap-6 mt-4">
+                        <button
+                            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                            onClick={() => setConfirm(true)}
+                        >
+                            是
+                        </button>
+                        <button
+                            className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
+                            onClick={() => router.push("/doctor")}
+                        >
+                            否
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) return <div className="text-center mt-10">載入中...</div>;
 
