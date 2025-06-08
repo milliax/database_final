@@ -48,7 +48,7 @@ export default function DoctorSchedulePage() {
 
     const today = new Date();
     const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 6);
+    const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
 
     console.log("Start of the week:", startDayOfWeek);
 
@@ -195,13 +195,15 @@ const PatientInfo = ({
 
     let dateSelected: Date | null = null;
 
-    const now = new Date()
-    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() - 6);
+    const now = new Date();
+    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
     const todayWithoutTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // console.log("start day of week, ", startDayOfWeek);
 
-    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + slot % 7);
+    const slotIdx = Math.floor(slot / 7); // 0:早 1:午 2:晚
+    const dayIdx = slot % 7; // 0~6
+    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + dayIdx);
 
     if (dateSelected < todayWithoutTime) {
         dateSelected = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 7);
@@ -215,8 +217,8 @@ const PatientInfo = ({
             const response = await fetch(`/api/doctor/schedule/patients`, {
                 method: "POST",
                 body: JSON.stringify({
-                    date: dateSelected, // 假設你要查詢今天的病患名單
-                    slot: slot
+                    date: dateSelected,
+                    slot: slotIdx
                 })
             });
 
