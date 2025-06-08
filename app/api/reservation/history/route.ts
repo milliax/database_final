@@ -46,7 +46,16 @@ export async function GET() {
                 .sort((a, b) => {
                     const dateA = a.ConsultingRoom?.day ? new Date(a.ConsultingRoom.day).getTime() : 0;
                     const dateB = b.ConsultingRoom?.day ? new Date(b.ConsultingRoom.day).getTime() : 0;
-                    return dateB - dateA;
+
+                    const slotA = a.ConsultingRoom?.slot || 0; // 0: 早, 1: 中, 2: 晚
+                    const slotB = b.ConsultingRoom?.slot || 0;
+
+                    // return dateB - dateA;
+                    if (dateB !== dateA) {
+                        return dateB - dateA; // 按日期降序排列
+                    } else {
+                        return slotA - slotB; // 如果日期相同，按時段降序排列
+                    }
                 })
                 .map((c) => ({
                     id: c.id,
@@ -57,6 +66,7 @@ export async function GET() {
                         : "",
                     detail: c.description || "",
                     commented: (c.Feedback && c.Feedback.length > 0) ? true : false,
+                    slot: c.ConsultingRoom?.slot || 0, // 0: 早, 1: 中, 2: 晚
                 }));
 
         return NextResponse.json({ userName, reservations });
