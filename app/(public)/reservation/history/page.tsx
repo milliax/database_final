@@ -13,6 +13,7 @@ type Reservation = {
     prescription?: string;
     commented?: boolean;
     commentContent?: string; // 新增
+    commentRating?: number; // 新增
     slot: number;
     appointmentStatus?: string;
 };
@@ -93,7 +94,7 @@ export default function ReservationHistoryPage() {
 
         if (result.isConfirmed) {
             setReservations(reservations.map((r, i) =>
-                i === idx ? { ...r, commented: true, commentContent: comment } : r
+                i === idx ? { ...r, commented: true, commentContent: comment, commentRating: rating } : r
             ));
             setShowCommentIdx(null);
             setOpenIdx(null);
@@ -286,7 +287,7 @@ export default function ReservationHistoryPage() {
                                             {[1, 2, 3, 4, 5].map(star => (
                                                 <span
                                                     key={star}
-                                                    className={`text-2xl ${star <= rating ? "text-yellow-400" : "text-gray-300"}`}
+                                                    className={`text-2xl ${star <= (r.commentRating || 0) ? "text-yellow-400" : "text-gray-300"}`}
                                                 >★</span>
                                             ))}
                                         </div>
