@@ -179,6 +179,7 @@ const HistoryConsultations = ({
         const res = await fetch(`/api/admin/patient/hist/${patientId}`, {
             method: 'GET',
         });
+        console.log(patientId)
         if (!res.ok) {
             const errorData = await res.json();
             Swal.fire({

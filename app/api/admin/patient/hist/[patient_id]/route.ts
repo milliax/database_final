@@ -22,17 +22,23 @@ export const GET = async (request: NextRequest, {
                 id: patient_id,
             },
             select: {
-                doctor: {
+                id: true,
+                patient: {
                     select: {
-                        id: true,
+                        id: true
                     }
                 }
             }
 
         });
+
+        if (!user) {
+            return NextResponse.json({ error: 'Patient not found' }, { status: 404 });
+        }
+
         const consultation = await prisma.consultation.findMany({
             where: {
-                patientId: user?.doctor?.id, // Assuming you want to fetch consultations for the patient's doctor
+                patientId: user?.patient?.id ?? "", // Assuming you want to fetch consultations for the patient's doctor
             },
             orderBy: {
                 createdAt: 'desc', // Get the most recent consultation
@@ -43,7 +49,7 @@ export const GET = async (request: NextRequest, {
                 ConsultingRoom: {
                     include: {
                         doctor: {
-                            include:{
+                            include: {
                                 user: true
                             }
                         }
