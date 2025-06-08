@@ -26,7 +26,7 @@ export const GET = async (req: NextRequest) => {
             address: user.address,
             emergency_contact_name: user.patient.emergency_contact_name || "",
             emergency_contact_phone: user.patient.emergency_contact_phone || "",
-            email: user.patient.email || user.email || "",
+            email: user.patient.email || "",
             id_card_image: user.patient.id_card_image || "",
         });
     } catch (error) {

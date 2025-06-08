@@ -80,7 +80,7 @@ export default function Login() {
                     customSignIn();
                 }} className="px-10 py-8 space-y-3">
                     <input className={decorateClassName}
-                        placeholder="身分證字號 | 電子郵件"
+                        placeholder="身分證字號"
                         value={email}
                         type="text"
                         onChange={(event) => {

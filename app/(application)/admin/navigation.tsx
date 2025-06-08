@@ -52,26 +52,14 @@ export default function AdminNavigation() {
 
                 <NavigationMenuItem>
                     <NavigationMenuTrigger className="cursor-pointer">報表</NavigationMenuTrigger>
-                    <NavigationMenuContent>
+                    <NavigationMenuContent className="left-1/2 -translate-x-1/2">
                         <ul className="grid w-[10rem] gap-2 place-items-center">
-                            <Link href="/admin/report/chart" className="text-slate-900 hover:text-slate-600">
-                                {/* <NavigationMenuLink className="text-slate-900 hover:text-slate-600 w-32 text-center"> */}
-                                季度報告
-                                {/* </NavigationMenuLink> */}
+                            <Link href="/admin/report/chart" className="text-slate-900 hover:text-slate-600 text-center w-32">
+                                報表紀錄
                             </Link>
                         </ul>
-                        {/* <NavigationMenuLink></NavigationMenuLink> */}
                     </NavigationMenuContent>
                 </NavigationMenuItem>
-
-                <NavigationMenuLink asChild>
-                    <Link href="#">
-                        <div className="font-medium">通知</div>
-                        {/* <div className="text-muted-foreground">
-                                    Learn how to use the library.
-                                    </div> */}
-                    </Link>
-                </NavigationMenuLink>
             </NavigationMenuList>
         </NavigationMenu>
     )
