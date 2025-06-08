@@ -168,6 +168,18 @@ const EditDoctorForm = ({
                             event.preventDefault();
                             sendData()
                         }}>
+                            {/* 新增這一段：只讀 email */}
+                            <div className="flex flex-row gap-3 items-center">
+                                <label className="block text-sm font-medium text-gray-700 w-12">Email</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-gray-100"
+                                    value={doctor?.email || ""}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
+
                             <div className="flex flex-row gap-3 items-center">
                                 <label className="block text-sm font-medium text-gray-700 w-12">姓名</label>
                                 <input
