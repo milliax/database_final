@@ -276,8 +276,7 @@ const PatientInfo = ({
                                     <tr>
                                         <th className="px-4 py-2 border-b">#</th>
                                         <th className="px-4 py-2 border-b">姓名</th>
-                                        <th className="px-4 py-2 border-b">Email</th>
-                                        <th className="px-4 py-2 border-b">電話</th>
+                                        <th className="px-4 py-2 border-b">身分證字號</th>
                                         <th className="px-4 py-2 border-b">詳細資料</th>
                                     </tr>
                                 </thead>
@@ -287,7 +286,6 @@ const PatientInfo = ({
                                             <td className="px-4 py-2 border-b text-center">{index + 1}</td>
                                             <td className="px-4 py-2 border-b">{patient.patient.user.name}</td>
                                             <td className="px-4 py-2 border-b">{patient.patient.user.email}</td>
-                                            <td className="px-4 py-2 border-b">{patient.patient.user.phone}</td>
                                             <td className="px-4 py-2 border-b text-center">
                                                 <button
                                                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700"
