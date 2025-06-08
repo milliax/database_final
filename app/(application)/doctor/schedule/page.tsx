@@ -50,7 +50,7 @@ export default function DoctorSchedulePage() {
     const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 6);
 
-    console.log("Start of the week:", startDayOfWeek);
+    // console.log("Start of the week:", startDayOfWeek);
 
     return (
         <div className="max-w-3xl mx-auto py-10">
@@ -211,7 +211,8 @@ const PatientInfo = ({
         setLoading(true)
 
         try {
-            console.log(date, slot)
+            console.log("date")
+            console.log(dateSelected, slot)
             const response = await fetch(`/api/doctor/schedule/patients`, {
                 method: "POST",
                 body: JSON.stringify({
