@@ -39,9 +39,12 @@ export default function DoctorClinicPage({
         setCurrentNumber(data.number_now);
 
         // set selectedPatient to IN_PROGRESS patient if exists
-        const inProgressPatient = data.consultations.find((c: any) => c.consultingStatus === "IN_PROGRESS");
+        const inProgressPatient = data.consultations.findIndex((c: any) => c.consultingStatus === "IN_PROGRESS");
         if (inProgressPatient) {
-            setSelectedPatient(inProgressPatient.id);
+            console.log(inProgressPatient)
+            setSelectedPatient(inProgressPatient);
+        } else {
+            setSelectedPatient(null);
         }
 
         setQueue(data.consultations);
@@ -120,9 +123,8 @@ export default function DoctorClinicPage({
     };
 
     const fetchPrescription = async (id: string) => {
-        // TODO
         const res = await fetch(`/api/doctor/clinic/consultation/${id}/prescription`);
-        if(!res.ok) {
+        if (!res.ok) {
             const result = await res.json();
             Swal.fire({
                 icon: "error",
@@ -138,7 +140,7 @@ export default function DoctorClinicPage({
     }
 
     useEffect(() => {
-        if (selectedPatient) {
+        if (selectedPatient && selectedPatient >= 0) {
             if (selectedPatient < queue.length) {
                 fetchPrescription(queue[selectedPatient].id)
             }
@@ -301,9 +303,9 @@ export default function DoctorClinicPage({
                     </div>
                 </div>
                 {/* 下方：當前病患資訊 */}
-                {selectedPatient !== null && (
+                {selectedPatient !== null && selectedPatient !== -1 && (
                     <div className="mt-8">
-                        <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{queue[selectedPatient].patient.user.name}</div>
+                        <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{queue[selectedPatient]?.patient.user.name ?? selectedPatient}</div>
                         <div className="mb-4">
                             <label className="block text-gray-600 mb-1">病情描述</label>
                             <TextareaAutosize
