@@ -95,10 +95,9 @@ export default function Home() {
             </div>
 
             {/* 院址等資訊區塊 */}
-            <div className="w-full bg-white py-8 px-4 mt-3">
+            <div className="w-full bg-white py-8 px-4 mt-1">
                 <div className="max-w-4xl mx-auto text-center text-gray-700">
-                    <div className="text-lg font-bold mb-2">聯絡資訊</div>
-                    <div className="mb-1">院址：台灣省台中市西屯區幸福路123號</div>
+                    <div className="mb-1">院址：台中市西屯區幸福路123號</div>
                     <div className="mb-1">總機電話：(04) 1234-5678</div>
                     <div className="mb-1">掛號專線：(04) 8765-4321</div>
                     <div className="mb-1">服務信箱：service@chiuhospital.fake</div>
