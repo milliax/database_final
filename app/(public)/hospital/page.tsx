@@ -12,11 +12,11 @@ export default function HospitalPage() {
                 transition={{ duration: 1.2, type: "spring" }}
             >
                 <Image
-                    src="/images/hos.jpg"
+                    src="/images/hosp.jpg"
                     alt="Hospital Image"
                     width={1200}
                     height={600}
-                    className="w-full h-100 object-cover"
+                    className="w-full h-135 object-cover object-top"
                 />
             </motion.div>
             <motion.h1
