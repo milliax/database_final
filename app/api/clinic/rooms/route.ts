@@ -117,9 +117,10 @@ export const GET = async (req: NextRequest) => {
                 ]
             },
             take: 5,
-            orderBy: {
-                day: 'asc',
-            }
+            orderBy: [
+                { day: 'asc' },
+                { slot: 'asc' },
+            ]
         });
 
         if (!clinicStatus) {

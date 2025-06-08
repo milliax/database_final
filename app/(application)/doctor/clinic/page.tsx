@@ -76,7 +76,7 @@ export default function DoctorClinicPage() {
                                 </div>
                                 <button
                                     className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
-                                    onClick={() => window.location.href = `/doctor/clinic/${room.roomId}`}
+                                    onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
                                 >
                                     開始看診
                                 </button>

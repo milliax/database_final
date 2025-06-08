@@ -1,11 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ConsultingRoomStatus } from "@/generated/prisma";
+import { LoadingCircle } from "@/components/loading";
 
 export default function DoctorClinicPage({
     roomId,
+    status,
+    isClinicWatchingTime
 }: {
     roomId: string
+    status: ConsultingRoomStatus
+    isClinicWatchingTime: boolean
 }) {
     const [loading, setLoading] = useState(true);
     const [currentNumber, setCurrentNumber] = useState<number>(0);
@@ -22,9 +28,10 @@ export default function DoctorClinicPage({
     // 取得診間狀態
     const fetchClinicStatus = async () => {
         setLoading(true);
-        const res = await fetch("/api/clinic");
+        const res = await fetch(`/api/doctor/clinic/${roomId}`);
         const data = await res.json();
-        setCurrentNumber(data.currentNumber);
+        console.log(data)
+        setCurrentNumber(data.number_now);
         setCurrentPatient(data.currentPatient);
         setQueue(data.queue);
         setDescription(data.currentPatient?.description || "");
@@ -33,8 +40,8 @@ export default function DoctorClinicPage({
     };
 
     useEffect(() => {
-        if (confirm) fetchClinicStatus();
-    }, [confirm]);
+        if (status !== "PENDING") fetchClinicStatus();
+    }, [status]);
 
     // 叫下一號
     const nextPatient = async () => {
@@ -70,7 +77,7 @@ export default function DoctorClinicPage({
     };
 
     // 新增：進入頁面先詢問是否開始看診
-    if (!confirm) {
+    if (status === "PENDING" && !isClinicWatchingTime) {
         // 取得現在日期與時段
         const now = new Date();
         const dateStr = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
@@ -108,7 +115,24 @@ export default function DoctorClinicPage({
                     <div className="flex gap-6 mt-4">
                         <button
                             className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-                            onClick={() => setConfirm(true)}
+                            onClick={() => {
+                                // update clinic room status to progressing
+
+                                fetch(`/api/doctor/clinic/${roomId}/start`)
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.error) {
+                                            alert(data.error);
+                                        } else {
+                                            // reload this page
+                                            router.push(`/doctor/clinic/${roomId}`);
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error starting clinic:", error);
+                                        alert("無法開始看診，請稍後再試。");
+                                    })
+                            }}
                         >
                             是
                         </button>
@@ -124,7 +148,9 @@ export default function DoctorClinicPage({
         );
     }
 
-    if (loading) return <div className="text-center mt-10">載入中...</div>;
+    if (loading) return <div className="text-center mt-10">
+        <LoadingCircle />
+    </div>;
 
     return (
         <div className="min-h-screen bg-green-50 flex flex-col items-center py-10 relative">
