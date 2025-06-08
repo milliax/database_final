@@ -1,9 +1,10 @@
 "use client";
 import { numberInLetter } from "@/lib/utils";
 // import { Session } from "inspector/promises";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { clsx } from "clsx";
 import { LoadingCircle } from "@/components/loading";
+import { date } from "zod";
 
 // 假設你有取得登入醫生的 id
 // 實際專案請用 session 或 context 取得 doctorId
@@ -17,6 +18,10 @@ type ScheduleCell = {
 export default function DoctorSchedulePage() {
     const [schedule, setSchedule] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // const [dateSelected, setDateSelected] = useState<Date | null>(null);
+
+    const [slotSelected, setSlotSelected] = useState<number | null>(null);
 
     useEffect(() => {
         // 取得本週起始日（週日）
@@ -84,6 +89,7 @@ export default function DoctorSchedulePage() {
                                         </div>
                                     )
                                 }
+
                                 return (
                                     <div key={Math.random()} className="flex flex-col items-center p-2 border border-gray-300 rounded-md select-none">
                                         <span className="text-sm text-black">{`${numberInLetter(d - 1)}`}</span>
@@ -117,6 +123,10 @@ export default function DoctorSchedulePage() {
                                             <CellBody
                                                 key={index}
                                                 isAvailable={isAvailable === 1}
+                                                slotSelected={slotSelected}
+                                                setSlotSelected={setSlotSelected}
+
+                                                index={index}
                                             />
                                         </React.Fragment>
                                     )
@@ -125,6 +135,10 @@ export default function DoctorSchedulePage() {
                                     <CellBody
                                         key={index}
                                         isAvailable={isAvailable === 1}
+                                        slotSelected={slotSelected}
+                                        setSlotSelected={setSlotSelected}
+
+                                        index={index}
                                     />
                                 )
                             })}
@@ -132,23 +146,118 @@ export default function DoctorSchedulePage() {
                     </React.Fragment>
                 )}
             </div>
+
+            {slotSelected !== null && (
+                <div className="flex flex-col items-center mt-10 gap-3">
+                    <h2 className="text-4xl font-semibold">病患名單</h2>
+
+                    <PatientInfo slot={slotSelected} />
+                </div>
+            )}
         </div>
     );
 }
 
 const CellBody = ({
-    isAvailable
+    isAvailable,
+    slotSelected,
+    setSlotSelected,
+
+    index
 }: {
     isAvailable: boolean;
+    slotSelected?: number | null;
+    setSlotSelected?: Dispatch<SetStateAction<number | null>>;
+
+    index: number;
 }) => {
     return (
         <div className={clsx("flex flex-col items-center p-2 border border-gray-300 rounded-md",
             isAvailable ? "bg-slate-600" : "bg-slate-100")} onClick={() => {
-
+                if (isAvailable) {
+                    setSlotSelected && setSlotSelected(index);
+                }
             }} >
             {isAvailable && (
                 <span className="text-sm text-white cursor-pointer">{isAvailable ? "病患名單" : ""}</span>
             )}
         </div>
+    )
+}
+
+const PatientInfo = ({
+    slot
+}: {
+    slot: number;
+}) => {
+    const [patients, setPatients] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    let dateSelected: Date | null = null;
+
+    const now = new Date()
+    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() - 6);
+    const todayWithoutTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    console.log("start day of week, ", startDayOfWeek);
+
+    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + slot % 7);
+
+
+    if (dateSelected < todayWithoutTime) {
+        dateSelected = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 7);
+    }
+
+    const fetchPatients = async () => {
+        setLoading(true)
+        try {
+            const response = await fetch(`/api/doctor/schedule/patients`, {
+                method: "POST",
+                body: JSON.stringify({
+                    date: new Date().toISOString(), // 假設你要查詢今天的病患名單
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch patients");
+            }
+            const data = await response.json();
+            setPatients(data.patients || []);
+        } catch (error) {
+            console.error("Error fetching patients:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchPatients()
+    }, [slot])
+
+    return (
+        <div>
+            <h3 className="text-2xl font-semibold mb-4">時段：{dateSelected.toLocaleDateString()} {slot < 7 ? "早班" : (slot < 14) ? "午班" : "晚班"}</h3>
+            {/* 這裡可以顯示更多病患資訊 */}
+            {loading ? (
+                <div className="flex items-center justify-center h-40">
+                    <LoadingCircle color="BLUE" scale="SM" />
+                </div>
+            ) : (
+                <React.Fragment>
+                    {patients.length > 0 ? (
+                        <ul className="list-disc pl-5">
+                            {patients.map((patient, index) => (
+                                <li key={index} className="text-sm text-gray-700">
+                                    {patient.name} - {patient.condition}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-xl text-gray-500 font-semibold py-10">此時段無病患名單</p>
+                    )}
+                </React.Fragment>
+            )}
+
+        </div >
     )
 }
