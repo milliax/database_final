@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 type Stats = { totalReservations: number; noShowRate: number; avgRating: number };
+
 type DoctorStatsMap = {
     [key: string]: {
         yesterday: Stats;
@@ -22,7 +23,7 @@ export default function AdminReportChartPage() {
 
     const current: Stats = doctorResult
         ? doctorResult[selected]
-        : report![selected];
+        : report?.[selected] ?? { totalReservations: 0, noShowRate: 0, avgRating: 0 };
 
     const handleDoctorSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,7 +40,10 @@ export default function AdminReportChartPage() {
     useEffect(() => {
         fetch("/api/admin/report/summary")
             .then(res => res.json())
-            .then(setReport);
+            .then((data)=>{
+                setReport(data);
+                console.log(data)
+            });
     }, []);
 
     const [search, setSearch] = useState("");
@@ -55,7 +59,7 @@ export default function AdminReportChartPage() {
             {/* 切換按鈕 */}
             <div className="flex gap-4 justify-center mb-2">
                 <button
-                    className={`px-6 py-2 rounded-lg font-bold border transition 
+                    className={`px-6 py-2 rounded-lg font-bold border transition cursor-pointer
                         ${selected === "yesterday"
                             ? "bg-blue-600 text-white border-blue-600"
                             : "bg-white text-blue-600 border-blue-300 hover:bg-blue-50"}`}
@@ -64,7 +68,7 @@ export default function AdminReportChartPage() {
                     昨天
                 </button>
                 <button
-                    className={`px-6 py-2 rounded-lg font-bold border transition 
+                    className={`px-6 py-2 rounded-lg font-bold border transition cursor-pointer
                         ${selected === "lastWeek"
                             ? "bg-blue-600 text-white border-blue-600"
                             : "bg-white text-blue-600 border-blue-300 hover:bg-blue-50"}`}
@@ -74,7 +78,7 @@ export default function AdminReportChartPage() {
                 </button>
             </div>
             {/* 搜尋醫生 */}
-            <form className="flex justify-center gap-2" onSubmit={handleDoctorSearch}>
+            {/* <form className="flex justify-center gap-2" onSubmit={handleDoctorSearch}>
                 <input
                     type="text"
                     className="border border-gray-300 rounded-lg px-4 py-2 w-48"
@@ -100,7 +104,7 @@ export default function AdminReportChartPage() {
                         清除
                     </button>
                 )}
-            </form>
+            </form> */}
             {/* 報表卡片 */}
             <div className="flex flex-col gap-6">
                 <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
@@ -122,12 +126,12 @@ export default function AdminReportChartPage() {
             {/* 醫生報表 */}
             <div className="mt-8">
                 <div className="mb-4 flex gap-2">
-                    <input
+                    {/* <input
                         className="border rounded px-2 py-1"
                         placeholder="搜尋醫生姓名"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                    />
+                    /> */}
                 </div>
                 <table className="min-w-full border border-gray-300 rounded-lg">
                     <thead className="bg-gray-100">
