@@ -48,7 +48,7 @@ export default function DoctorSchedulePage() {
 
     const today = new Date();
     const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 6);
 
     // console.log("Start of the week:", startDayOfWeek);
 
@@ -198,15 +198,13 @@ const PatientInfo = ({
 
     let dateSelected: Date | null = null;
 
-    const now = new Date();
-    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+    const now = new Date()
+    const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() - 6);
     const todayWithoutTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // console.log("start day of week, ", startDayOfWeek);
 
-    const slotIdx = Math.floor(slot / 7); // 0:早 1:午 2:晚
-    const dayIdx = slot % 7; // 0~6
-    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + dayIdx);
+    dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + slot % 7);
 
     if (dateSelected < todayWithoutTime) {
         dateSelected = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 7);
@@ -221,8 +219,8 @@ const PatientInfo = ({
             const response = await fetch(`/api/doctor/schedule/patients`, {
                 method: "POST",
                 body: JSON.stringify({
-                    date: dateSelected,
-                    slot: slotIdx
+                    date: dateSelected, // 假設你要查詢今天的病患名單
+                    slot: slot
                 })
             });
 
@@ -239,14 +237,15 @@ const PatientInfo = ({
         }
     }
 
+    // 取得病患歷史紀錄
     const fetchHistory = async (patientId: string) => {
         setHistoryLoading(true);
         setDetailPatientId(patientId);
         try {
-            const res = await fetch(`/api/doctor/patient-history?doctorId=${doctorId}&patientId=${patientId}`);
+            const res = await fetch(`/api/doctor/patient-history?patientId=${patientId}`);
             const data = await res.json();
             setHistory(data.history || []);
-        } catch (e) {
+        } catch {
             setHistory([]);
         } finally {
             setHistoryLoading(false);
@@ -262,7 +261,6 @@ const PatientInfo = ({
             <h3 className="text-2xl font-semibold mb-4 text-center">
                 時段：{dateSelected.toLocaleDateString()} {slot < 7 ? "早班" : (slot < 14) ? "午班" : "晚班"}
             </h3>
-            {/* 這裡可以顯示更多病患資訊 */}
             {loading ? (
                 <div className="flex items-center justify-center h-40">
                     <LoadingCircle color="BLUE" scale="SM" />
@@ -274,7 +272,7 @@ const PatientInfo = ({
                             <table className="min-w-full border border-gray-300 rounded-lg">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="px-4 py-2 border-b">號碼</th>
+                                        <th className="px-4 py-2 border-b">#</th>
                                         <th className="px-4 py-2 border-b">姓名</th>
                                         <th className="px-4 py-2 border-b">Email</th>
                                         <th className="px-4 py-2 border-b">電話</th>
@@ -307,30 +305,48 @@ const PatientInfo = ({
                 </React.Fragment>
             )}
 
-            {/* 詳細資料彈窗或展開 */}
+            {/* 懸浮視窗顯示歷史紀錄 */}
             {detailPatientId && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl p-8 min-w-[350px] max-w-lg">
+                <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 min-w-[350px] max-w-lg animate-fade-in">
                         <div className="flex justify-between items-center mb-4">
                             <h4 className="text-xl font-bold">歷史看診紀錄</h4>
-                            <button onClick={() => setDetailPatientId(null)} className="text-gray-500 hover:text-black">關閉</button>
+                            <button
+                                onClick={() => setDetailPatientId(null)}
+                                className="text-gray-500 hover:text-black text-lg"
+                            >
+                                關閉
+                            </button>
                         </div>
                         {historyLoading ? (
                             <div className="text-center py-8">載入中...</div>
                         ) : history.length === 0 ? (
                             <div className="text-gray-500 py-8">無歷史紀錄</div>
                         ) : (
-                            <ul className="space-y-3 max-h-80 overflow-y-auto">
-                                {history.map((item, idx) => (
-                                    <li key={idx} className="border-b pb-2">
-                                        <div>日期：{new Date(item.createdAt).toLocaleDateString()}</div>
-                                        <div>描述：{item.description || "無"}</div>
-                                        <div>處方：{item.prescription || "無"}</div>
-                                        <div>評分：{item.rating ?? "無"}</div>
-                                        <div>評論：{item.comment ?? "無"}</div>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full border border-gray-300 rounded-lg text-sm">
+                                    <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="px-2 py-1 border-b">日期</th>
+                                            <th className="px-2 py-1 border-b">描述</th>
+                                            <th className="px-2 py-1 border-b">處方</th>
+                                            <th className="px-2 py-1 border-b">評分</th>
+                                            <th className="px-2 py-1 border-b">評論</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {history.map((item, idx) => (
+                                            <tr key={idx} className="hover:bg-green-50">
+                                                <td className="px-2 py-1 border-b">{new Date(item.createdAt).toLocaleDateString()}</td>
+                                                <td className="px-2 py-1 border-b">{item.description || "無"}</td>
+                                                <td className="px-2 py-1 border-b">{item.prescription || "無"}</td>
+                                                <td className="px-2 py-1 border-b">{item.rating ?? "無"}</td>
+                                                <td className="px-2 py-1 border-b">{item.comment ?? "無"}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
                 </div>
