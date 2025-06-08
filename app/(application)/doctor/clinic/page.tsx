@@ -62,7 +62,7 @@ export default function DoctorClinicPage() {
                             >
                                 <div className="h-2/5 flex flex-col justify-between">
                                     <h3>{room.roomId}</h3>
-                                    <p>門診日期: {Math.floor(room.slot / 7) === 0 ? "7:00 ~ 11:00" : (Math.floor(room.slot / 7) === 1 ? "13:00 ~ 17:00" : "18:00 ~ 22:00")}</p>
+                                    <p>門診日期: {room.slot === 0 ? "7:00 ~ 11:00" : room.slot === 1 ? "13:00 ~ 17:00" : "18:00 ~ 22:00"}</p>
                                     <p>門診時間: {new Date(room.day).toLocaleDateString()}</p>
                                     <p>星期: {numberInLetter(((new Date(room.day).getDay()) + 6) % 7)}</p>
                                 </div>

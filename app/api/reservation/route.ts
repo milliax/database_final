@@ -31,6 +31,10 @@ export const POST = async (req: NextRequest) => {
 
         const { doctor_id, time } = parsedBody.data;
 
+        if(time !== 0 && time !== 1 && time !== 2) {
+            return new Response(JSON.stringify({ error: "Invalid time slot" }), { status: 400 });
+        }
+
         const date = addHours(parsedBody.data.date, 8)
 
         console.log(doctor_id, date, time);
