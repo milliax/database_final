@@ -24,20 +24,13 @@ export default function Home() {
                     {/* 國立臺灣大學醫學院附設醫院 */}
                 </div>
                 <nav className="flex space-x-4 text-sm">
-                    <a href="#">訊息專區</a>
-                    <a href="#">認識本院</a>
-                    <a href="#">就醫指南</a>
-                    <a href="#">醫療團隊</a>
-                    <a href="#">特色醫療</a>
-                    <a href="#">為民服務</a>
-                    <a href="#">教學研究</a>
                 </nav>
             </div>
 
             {/* Image Banner */}
             <div className="w-full h-[40rem] bg-cover bg-center">
                 {/* Image slider dots if needed */}
-                <Image src="/images/library.jpg"
+                <Image src="/images/hosp.jpg"
                     alt="library"
                     width={800}
                     height={600}
@@ -49,7 +42,6 @@ export default function Home() {
             <div className="bg-yellow-200 px-6 py-6 text-center">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex justify-center space-x-4 mb-4">
-                        <input placeholder="搜尋..." className="w-full max-w-md" />
                     </div>
                     <div className="flex justify-center space-x-8 text-sm">
                         <button className="flex flex-col items-center">
@@ -65,17 +57,9 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* Icon Grid */}
-            <div className="bg-yellow-100 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 text-sm text-center">
-                <div>🏥 住院及探病相關</div>
-                <div>🩺 健康檢查</div>
-                <div>🧳 海外病友</div>
-                <div>📍 交通設施</div>
-                <div>💊 衛教及用藥諮詢</div>
-                <div>📄 就醫資料申請</div>
-                <div>➕ 人才招募</div>
+            
             </div>
-        </div>
+
     );
 }
 // <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
