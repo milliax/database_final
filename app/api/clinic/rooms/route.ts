@@ -68,19 +68,19 @@ export const GET = async (req: NextRequest) => {
 
             if (schedule[slot_number] === 1) {
                 // create a new consulting room
-                console.log(`Creating consulting room for slot: ${slot_number}, Moving Slot: ${movingSlot}`);
+                console.log(`Creating consulting room for slot: ${slot_number}, updated Slot: ${Math.floor(slot_number / 7)}, Moving Slot: ${movingSlot}`);
 
                 await prisma.consultingRoom.upsert({
                     where: {
                         doctorId_day_slot: {
                             doctorId: doctor.id,
                             day: addDays(start_of_day, Math.floor(movingSlot / 3)),
-                            slot: slot_number
+                            slot: Math.floor(slot_number / 7)
                         }
                     }, create: {
                         doctorId: doctor.id,
                         day: addDays(start_of_day, Math.floor(movingSlot / 3)),
-                        slot: slot_number,
+                        slot: Math.floor(slot_number / 7),
                     }, update: {}
                 })
 
@@ -106,7 +106,7 @@ export const GET = async (req: NextRequest) => {
 
         const clinicStatus = await prisma.consultingRoom.findMany({
             where: {
-                doctorId: session.user.id,
+                doctorId: doctor.id,
 
                 day: {
                     gte: start_of_day,

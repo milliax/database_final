@@ -56,14 +56,14 @@ export default function DepartmentPage({
             >
                 <h1 className="text-2xl font-bold mb-6">{department_name} 班表</h1>
                 {/* 新增：本週日期列 */}
-                
+
                 <div className="grid grid-cols-8 gap-0 divide-y divide-gray-600">
-                    <div /> 
+                    <div />
                     {Array.from({ length: 7 }).map((_, colIdx) => {
-                        const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
-                        const today = new Date();
-                        const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
-                        const day = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + colIdx);
+                        const weekDays = ["一", "二", "三", "四", "五", "六", "日"];
+                        // const today = new Date();
+                        // const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+                        // const day = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + colIdx);
                         return (
                             <div
                                 key={colIdx}
@@ -71,7 +71,7 @@ export default function DepartmentPage({
                             >
                                 <div className="w-36 border border-gray-400 bg-blue-200 py-1 flex flex-col items-center rounded-xl">
                                     <span className="font-semibold">{weekDays[colIdx]}</span>
-                                    <span className="text-black text-sm">{day.getMonth() + 1}/{day.getDate()}</span>
+                                    {/* <span className="text-black text-sm">{day.getMonth() + 1}/{day.getDate()}</span> */}
                                 </div>
                             </div>
                         );
@@ -90,11 +90,11 @@ export default function DepartmentPage({
                             return (
                                 <React.Fragment key={index}>
                                     <div>
-                                        <div className="w-36 border border-gray-400 bg-blue-100 py-8 flex flex-col items-center justify-center rounded-xl font-semibold border-b-4 border-gray-600">
+                                        <div className="w-36 border bg-blue-100 py-8 flex flex-col items-center justify-center rounded-xl font-semibold border-b-4 border-gray-600">
                                             {timeLabel}
                                         </div>
                                     </div>
-                                    <div className="text-center font-semibold flex flex-col gap-1 border-b-4 border-gray-600 bg-WHITE border-l border-gray-400 border-r border-gray-400">
+                                    <div className="text-center font-semibold flex flex-col justify-center gap-1 border-b-4 bg-WHITE border-l border-r border-gray-600">
                                         {slot.map((doctor, colIdx) => (
                                             <div key={doctor}>
                                                 {doctor}
@@ -106,7 +106,7 @@ export default function DepartmentPage({
                         }
 
                         return (
-                            <div key={index} className="text-center font-semibold flex flex-col gap-1 border-b-4 border-gray-600 bg-WHITE border-r border-gray-400">
+                            <div key={index} className="text-center font-semibold justify-center flex flex-col gap-1 border-b-4 border-gray-600 bg-WHITE border-r">
                                 {slot.map((doctor, colIdx) => (
                                     <div key={doctor}>
                                         {doctor}

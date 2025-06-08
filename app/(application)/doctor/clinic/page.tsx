@@ -4,14 +4,6 @@ import { numberInLetter } from "@/lib/utils";
 import React, { useState, useEffect } from "react";
 
 export default function DoctorClinicPage() {
-    // const clinicRooms = [
-    //     { roomId: 1, slot: 1, date: "2024-01-01" },
-    //     { roomId: 2, slot: 0, date: "2024-01-02" },
-    //     { roomId: 3, slot: 2, date: "2024-01-03" },
-    //     { roomId: 4, slot: 2, date: "2024-01-04" },
-    //     { roomId: 5, slot: 0, date: "2024-01-05" },
-    // ];
-
     const [currentDate, setCurrentDate] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -70,7 +62,7 @@ export default function DoctorClinicPage() {
                             >
                                 <div className="h-2/5 flex flex-col justify-between">
                                     <h3>{room.roomId}</h3>
-                                    <p>門診日期: {Math.floor(room.slot / 7) === 0 ? "7:00 ~ 11:00" : (Math.floor(room.slot / 7) === 1 ? "13:00 ~ 17:00" : "18:00 ~ 22:00")}</p>
+                                    <p>門診日期: {room.slot === 0 ? "7:00 ~ 11:00" : room.slot === 1 ? "13:00 ~ 17:00" : "18:00 ~ 22:00"}</p>
                                     <p>門診時間: {new Date(room.day).toLocaleDateString()}</p>
                                     <p>星期: {numberInLetter(((new Date(room.day).getDay()) + 6) % 7)}</p>
                                 </div>
