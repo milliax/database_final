@@ -110,11 +110,7 @@ export const GET = async (req: NextRequest) => {
 
                 day: {
                     gte: start_of_day,
-                },
-                OR: [
-                    { status: "PENDING" },
-                    { status: "IN_PROGRESS" },
-                ]
+                }
             },
             take: 5,
             orderBy: [

@@ -74,12 +74,22 @@ export default function DoctorClinicPage() {
                                     <p>門診時間: {new Date(room.day).toLocaleDateString()}</p>
                                     <p>星期: {numberInLetter(((new Date(room.day).getDay()) + 6) % 7)}</p>
                                 </div>
-                                <button
-                                    className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
-                                    onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
-                                >
-                                    開始看診
-                                </button>
+                                <div className="flex flex-col gap-2">
+                                    {room.status === "COMPLETED" &&
+                                        <button
+                                            className="px-4 py-2 rounded bg-red-500 text-white transition-colors cursor-not-allowed"
+                                        // onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
+                                        >
+                                            已看完ㄌ
+                                        </button>
+                                    }
+                                    <button
+                                        className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
+                                        onClick={() => window.location.href = `/doctor/clinic/${room.id}`}
+                                    >
+                                        開始看診
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </React.Fragment>
