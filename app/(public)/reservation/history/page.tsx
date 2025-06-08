@@ -99,7 +99,7 @@ export default function ReservationHistoryPage() {
     const handleSubmitComment = async (idx: number) => {
         const result = await Swal.fire({
             title: "確認送出評論？",
-            text: "送出後可再次編輯。",
+            text: "注意：送出後不可再次編輯！！。",
             icon: "question",
             showCancelButton: true,
             confirmButtonText: "確認",
