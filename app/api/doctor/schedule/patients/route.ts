@@ -65,9 +65,12 @@ export const POST = async (req: NextRequest) => {
                                 user: true,
                             },
                         }
+                    },
+                    orderBy:{
+                        createdAt: 'asc',
                     }
                 }
-            }
+            },
         })
 
         if (!consultingRoom) {
