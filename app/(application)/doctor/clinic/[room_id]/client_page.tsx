@@ -19,13 +19,13 @@ export default function DoctorClinicPage({
 }) {
     const [loading, setLoading] = useState(true);
     const [currentNumber, setCurrentNumber] = useState<number>(0);
-    const [currentPatient, setCurrentPatient] = useState<any>(null);
     const [description, setDescription] = useState("");
     const [prescription, setPrescription] = useState("");
     const [queue, setQueue] = useState<any[]>([]);
     const [patientStatus, setPatientStatus] = useState<{ [id: string]: string }>({});
-    const [confirm, setConfirm] = useState(false);
     const [showEndConfirm, setShowEndConfirm] = useState(false);
+
+    const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
 
     const router = useRouter();
 
@@ -37,7 +37,15 @@ export default function DoctorClinicPage({
         console.log(data)
 
         setCurrentNumber(data.number_now);
-        setCurrentPatient(data.currentPatient);
+
+        // set selectedPatient to IN_PROGRESS patient if exists
+        const inProgressPatient = data.consultations.findIndex((c: any) => c.consultingStatus === "IN_PROGRESS");
+        if (inProgressPatient) {
+            console.log(inProgressPatient)
+            setSelectedPatient(inProgressPatient);
+        } else {
+            setSelectedPatient(null);
+        }
 
         setQueue(data.consultations);
         setDescription(data.currentPatient?.description || "");
@@ -97,7 +105,6 @@ export default function DoctorClinicPage({
         setPatientStatus(prev => ({ ...prev, [id]: status }));
 
         if (status === "consulting") {
-            // TODO: 看診中
 
         } else if (status === "checked_in") {
 
@@ -114,6 +121,32 @@ export default function DoctorClinicPage({
             fetchClinicStatus();
         }
     };
+
+    const fetchPrescription = async (id: string) => {
+        const res = await fetch(`/api/doctor/clinic/consultation/${id}/prescription`);
+        if (!res.ok) {
+            const result = await res.json();
+            Swal.fire({
+                icon: "error",
+                title: "取得處方失敗",
+                text: result.error || "無法取得處方，請稍後再試。",
+            });
+            return;
+        }
+        const data = await res.json();
+        console.log(data)
+        setDescription(data.description || "");
+        setPrescription(data.prescription || "");
+    }
+
+    useEffect(() => {
+        if (selectedPatient && selectedPatient >= 0) {
+            if (selectedPatient < queue.length) {
+                fetchPrescription(queue[selectedPatient].id)
+            }
+        }
+
+    }, [selectedPatient]);
 
     // 結束看診
     const endClinic = async () => {
@@ -227,12 +260,14 @@ export default function DoctorClinicPage({
                         <ul className="space-y-2">
                             {queue && queue.length > 0 ? (
                                 queue.map((consultation, idx) => (
-                                    <li key={consultation.id} className={clsx("rounded px-4 py-2 flex items-center justify-between",
+                                    <li key={consultation.id} className={clsx("rounded px-4 py-2 flex items-center justify-between selected-none cursor-pointer",
                                         consultation.consultingStatus === "PENDING" ? "bg-green-100" : (
                                             consultation.consultingStatus === "IN_PROGRESS" ? "bg-blue-100" : (
                                                 consultation.consultingStatus === "COMPLETED" ? "bg-green-300" : "bg-red-100"
                                             ))
-                                    )}>
+                                    )} onClick={() => {
+                                        setSelectedPatient(idx);
+                                    }}>
                                         <div>
                                             <span className="font-semibold">{consultation.patient.user.name}</span>
                                             <span className="ml-4 text-gray-500">號碼 {idx + 1}</span>
@@ -268,9 +303,9 @@ export default function DoctorClinicPage({
                     </div>
                 </div>
                 {/* 下方：當前病患資訊 */}
-                {currentNumber !== 0 && currentNumber < queue.length && (
+                {selectedPatient !== null && selectedPatient !== -1 && (
                     <div className="mt-8">
-                        <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{queue[currentNumber - 1].patient.user.name}</div>
+                        <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{queue[selectedPatient]?.patient.user.name ?? selectedPatient}</div>
                         <div className="mb-4">
                             <label className="block text-gray-600 mb-1">病情描述</label>
                             <TextareaAutosize
@@ -303,12 +338,17 @@ export default function DoctorClinicPage({
                 )}
             </div>
             {/* 右下角結束看診按鈕 */}
-            <button
-                className="fixed bottom-10 right-10 bg-red-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-red-700 transition active:scale-95 z-50 cursor-pointer"
-                onClick={() => setShowEndConfirm(true)}
-            >
-                結束看診
-            </button>
+            <div className="absolute bottom-10 right-10">
+                <span className="text-gray-500">點擊結束看診</span>
+            </div>
+            {status !== "COMPLETED" && (
+                <button
+                    className="fixed bottom-10 right-10 bg-red-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-red-700 transition active:scale-95 z-50 cursor-pointer"
+                    onClick={() => setShowEndConfirm(true)}
+                >
+                    結束看診
+                </button>
+            )}
             {/* 結束看診確認框 */}
             {showEndConfirm && (
                 <div

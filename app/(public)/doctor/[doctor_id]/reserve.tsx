@@ -118,6 +118,16 @@ export default function DoctorReservePage({
     const reserveNow = async () => {
         if (submitLoading) return
 
+        if(timeSelected !== "早" && timeSelected !== "中" && timeSelected !== "晚") {
+            Swal.fire({
+                title: "請選擇時段",
+                text: "請選擇早、中、晚其中一個時段",
+                icon: "warning",
+                confirmButtonText: "確定",
+            });
+            return;
+        }
+
         setSubmitLoading(true);
 
         const res = await fetch(`/api/reservation`, {
