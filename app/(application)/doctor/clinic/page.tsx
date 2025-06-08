@@ -12,6 +12,8 @@ export default function DoctorClinicPage() {
     const [patientStatus, setPatientStatus] = useState<{ [id: string]: string }>({});
     const [confirm, setConfirm] = useState(false);
     const [showEndConfirm, setShowEndConfirm] = useState(false);
+    const [showNextConfirm, setShowNextConfirm] = useState(false);
+    const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
     const router = useRouter();
 
@@ -133,7 +135,7 @@ export default function DoctorClinicPage() {
                         <div className="text-6xl font-bold text-green-700">{currentNumber}</div>
                         <button
                             className="mt-4 bg-green-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-green-700 transition active:scale-95"
-                            onClick={nextPatient}
+                            onClick={() => setShowNextConfirm(true)}
                         >
                             叫下一號
                         </button>
@@ -199,7 +201,7 @@ export default function DoctorClinicPage() {
                         </div>
                         <button
                             className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition"
-                            onClick={saveRecord}
+                            onClick={() => setShowSaveConfirm(true)}
                         >
                             儲存
                         </button>
@@ -234,6 +236,62 @@ export default function DoctorClinicPage() {
                             <button
                                 className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
                                 onClick={() => setShowEndConfirm(false)}
+                            >
+                                否
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* 叫下一號確認框 */}
+            {showNextConfirm && (
+                <div
+                    className="fixed inset-0 flex items-center justify-center z-50"
+                    style={{ background: "rgba(0,0,0,0.5)" }}
+                >
+                    <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-6 min-w-[320px]">
+                        <h2 className="text-xl font-bold mb-2">確定要叫下一號嗎？</h2>
+                        <div className="flex gap-6 mt-4">
+                            <button
+                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                                onClick={async () => {
+                                    setShowNextConfirm(false);
+                                    await nextPatient();
+                                }}
+                            >
+                                是
+                            </button>
+                            <button
+                                className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
+                                onClick={() => setShowNextConfirm(false)}
+                            >
+                                否
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* 儲存確認框 */}
+            {showSaveConfirm && (
+                <div
+                    className="fixed inset-0 flex items-center justify-center z-50"
+                    style={{ background: "rgba(0,0,0,0.5)" }}
+                >
+                    <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-6 min-w-[320px]">
+                        <h2 className="text-xl font-bold mb-2">確定要儲存本次看診資料嗎？</h2>
+                        <div className="flex gap-6 mt-4">
+                            <button
+                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                                onClick={async () => {
+                                    setShowSaveConfirm(false);
+                                    await saveRecord();
+                                }}
+                            >
+                                是
+                            </button>
+                            <button
+                                className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
+                                onClick={() => setShowSaveConfirm(false)}
                             >
                                 否
                             </button>

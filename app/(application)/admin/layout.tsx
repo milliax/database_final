@@ -25,7 +25,7 @@ export default async function AdminLayout({
         <React.Fragment>
             <nav className='flex flex-row bg-slate-100 w-full h-16 items-center justify-between px-5'>
                 <div className='flex flex-row items-center gap-5'>
-                    <Link href="/" className="text-slate-900 hover:text-slate-600">
+                    <Link href="/admin" className="text-slate-900 hover:text-slate-600">
                         <Image
                             src="/logo.png"
                             alt="Logo"
