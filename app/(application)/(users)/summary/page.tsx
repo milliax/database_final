@@ -22,20 +22,15 @@ export default function Home() {
                 </div>
                 <nav className="flex space-x-4 text-sm">
                     <a href="#">訊息專區</a>
-                    <a href="#">認識本院</a>
-                    <a href="#">就醫指南</a>
                     <a href="#">醫療團隊</a>
-                    <a href="#">特色醫療</a>
-                    <a href="#">為民服務</a>
-                    <a href="#">教學研究</a>
                 </nav>
             </div>
 
             {/* Image Banner */}
             <div className="w-full h-[40rem] bg-cover bg-center">
                 {/* Image slider dots if needed */}
-                <Image src="/images/library.jpg"
-                    alt="library"
+                <Image src="/images/hosp.jpg"
+                    alt="chiu hospital"
                     width={800}
                     height={600}
                     className="w-full h-full object-cover"
@@ -63,15 +58,8 @@ export default function Home() {
             </div>
 
             {/* Icon Grid */}
-            <div className="bg-yellow-100 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 text-sm text-center">
-                <div>🏥 住院及探病相關</div>
-                <div>🩺 健康檢查</div>
-                <div>🧳 海外病友</div>
-                <div>📍 交通設施</div>
-                <div>💊 衛教及用藥諮詢</div>
-                <div>📄 就醫資料申請</div>
-                <div>➕ 人才招募</div>
+          */ 
             </div>
-        </div>
+    
     );
 }
