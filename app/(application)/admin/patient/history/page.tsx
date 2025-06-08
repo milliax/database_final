@@ -98,7 +98,7 @@ export default function AdminSchedulePage() {
                                         <h2 className="text-lg font-semibold">{history.name}</h2>
                                         <p className="text-gray-600">身份證字號: {history.patient.id_card_number}</p>
                                         <p className="text-gray-500 text-sm">日期: {history.patient.consultations.length === 0 ? "尚未看診" : new Date(history.patient.consultations[0].createdAt).toLocaleDateString()}</p>
-                                        <button
+                                        {/* <button
                                             className="absolute right-4 bottom-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
                                             type="button"
                                             onClick={e => {
@@ -107,8 +107,8 @@ export default function AdminSchedulePage() {
                                             }}
                                         >
                                             {openIdx === index ? "收合" : "詳細資料"}
-                                        </button>
-                                        {openIdx === index && (
+                                        </button> */}
+                                        {/* {openIdx === index && (
                                             <div className="mt-4 p-4 bg-gray-50 rounded border border-gray-200">
                                                 {history.patient.consultations.length === 0 ? (
                                                     <div>尚未看診</div>
@@ -144,7 +144,7 @@ export default function AdminSchedulePage() {
                                                         ))
                                                 )}
                                             </div>
-                                        )}
+                                        )} */}
                                     </li>
                                 ))}
                             </ul>
@@ -171,8 +171,32 @@ const HistoryConsultations = ({
     selectedPatient: string | null
 }) => {
     const [display, setDisplay] = useState<boolean>(false);
+    const [history, setHistory] = useState<any[]>([]);
+
+    const fetchHistory = async (patientId: string) => {
+        if (!patientId) return;
+
+        const res = await fetch(`/api/admin/patient/hist/${patientId}`, {
+            method: 'GET',
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            Swal.fire({
+                icon: 'error',
+                title: '載入失敗',
+                text: errorData.error || '無法載入病歷紀錄',
+            });
+            return;
+        }
+        const data = await res.json();
+        console.log(data)
+        setHistory(data);
+    }
 
     useEffect(() => {
+        if (selectedPatient) {
+            fetchHistory(selectedPatient)
+        }
         if (selectedPatient) {
             setTimeout(() => {
                 setDisplay(true);
@@ -185,12 +209,40 @@ const HistoryConsultations = ({
     return (
         <React.Fragment>
             {display ? (
-                <div className="flex flex-col items-center">
-                    <h2 className="text-xl font-semibold mb-4">病歷紀錄</h2>
+                <div className="flex flex-col items-center px-3">
+                    <h2 className="text-xl font-semibold mb-4 py-2">病歷紀錄</h2>
                     {/* 這裡可以放置病歷紀錄的內容 */}
-                    {selectedPatient}
+                    {history.length === 0 ? (
+                        <div className="text-gray-500">尚未有病歷紀錄</div>
+                    ) : (
+                        <React.Fragment>
+                            {history.map((h) => (
+                                <div key={h.id} className="w-full max-w-4xl p-4 bg-white rounded-lg shadow-md mb-4 grid grid-cols-2 gap-4">
+                                    <div>日期</div>
+                                    <div>{new Date(h.createdAt).toDateString()}</div>
+                                    <div>醫生</div>
+                                    <div>{h.ConsultingRoom.doctor?.user?.name || ""}</div>
+                                    <div>狀態</div>
+                                    <div>{h.ConsultingRoom.status}</div>
+
+                                    <div>處方</div>
+                                    <div>{h.prescription || "無"}</div>
+                                    <div>症狀</div>
+                                    <div>{h.description || "無"}</div>
+
+                                    <div />
+                                    <div />
+
+                                    <div>Feedback</div>
+                                    <div>{h.Feedback?.[0]?.comment ?? ""}</div>
+                                    <div>Rating</div>
+                                    <div>{h.Feedback?.[0]?.rating ?? ""}</div>
+                                </div>
+                            ))}
+                        </React.Fragment>
+                    )}
                 </div>
-            ): (
+            ) : (
                 <></>
             )}
         </React.Fragment>
