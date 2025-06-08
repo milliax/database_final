@@ -17,6 +17,9 @@ export async function GET() {
                 patient: {
                     include: {
                         consultations: {
+                            where: {
+                                appointmentStatus: { not: "CANCELLED" }
+                            },
                             include: {
                                 ConsultingRoom: {
                                     include: {
@@ -65,8 +68,10 @@ export async function GET() {
                         ? c.ConsultingRoom.day.toISOString().split("T")[0]
                         : "",
                     detail: c.description || "",
+                    prescription: c.prescription || "", // <--- 新增這行
                     commented: (c.Feedback && c.Feedback.length > 0) ? true : false,
-                    slot: c.ConsultingRoom?.slot || 0, // 0: 早, 1: 中, 2: 晚
+                    slot: c.ConsultingRoom?.slot || 0,
+                    appointmentStatus: c.appointmentStatus || "", // 若有需要
                 }));
 
         return NextResponse.json({ userName, reservations });

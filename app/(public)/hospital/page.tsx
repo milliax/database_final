@@ -15,8 +15,8 @@ export default function HospitalPage() {
                     src="/images/hosp.jpg"
                     alt="Hospital Image"
                     width={1200}
-                    height={1000}
-                    className="w-full h-100 object-cover"
+                    height={600}
+                    className="w-full h-135 object-cover object-top"
                 />
             </motion.div>
             <motion.h1
@@ -53,7 +53,6 @@ export default function HospitalPage() {
                     我們誠摯邀請您來到本院，體驗我們的專業醫療服務與溫暖關懷。無論是健康檢查、疾病診療或是康復治療，我們都將竭誠為您提供最優質的醫療照護。
                 </p>
                 <p></p>
-
             </motion.div>
         </div>
     );
