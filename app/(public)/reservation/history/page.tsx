@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { LoadingCircle } from "@/components/loading";
+import Swal from "sweetalert2";
 
 type Reservation = {
     id: string;
@@ -24,11 +25,14 @@ export default function ReservationHistoryPage() {
     const [showCommentIdx, setShowCommentIdx] = useState<number | null>(null);
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState(5);
-    const [showSuccess, setShowSuccess] = useState(false);
 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        fetchReservations();
+    }, []);
+
+    const fetchReservations = () => {
         fetch("/api/reservation/history")
             .then(res => res.json())
             .then(data => {
@@ -39,14 +43,39 @@ export default function ReservationHistoryPage() {
                 if (data.userName) setUserName(data.userName);
                 setLoading(false);
             });
-    }, []);
+    }
 
-    const handleCancel = (idx: number) => {
+    const handleCancel = async (idx: number) => {
         setReservations(reservations.filter((_, i) => i !== idx));
+
         setShowCancelIdx(null);
         setOpenIdx(null);
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 1500);
+
+        const res = await fetch("/api/reservation/cancel", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: reservations[idx].id }),
+        })
+
+        if (!res.ok) {
+            Swal.fire({
+                icon: "error",
+                title: "取消預約失敗",
+                text: "請稍後再試或聯繫客服。",
+            })
+            fetchReservations();
+
+            return;
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "預約已取消",
+            text: "您的預約已成功取消。",
+        });
+        fetchReservations();
     };
 
     const handleSubmitComment = (idx: number) => {
@@ -79,13 +108,6 @@ export default function ReservationHistoryPage() {
                 <span className="font-semibold">姓名：</span>
                 <span>{userName}</span>
             </motion.div>
-            {showSuccess && (
-                <div className="fixed inset-0 flex items-center justify-center bg-transparent z-50">
-                    <div className="bg-white border border-gray-400 text-black px-8 py-6 rounded shadow text-2xl font-bold">
-                        成功取消預約
-                    </div>
-                </div>
-            )}
             <div className="space-y-4">
                 {reservations.length === 0 ? (
                     <React.Fragment>
