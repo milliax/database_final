@@ -199,10 +199,9 @@ const PatientInfo = ({
     const startDayOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() - 6);
     const todayWithoutTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    console.log("start day of week, ", startDayOfWeek);
+    // console.log("start day of week, ", startDayOfWeek);
 
     dateSelected = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + slot % 7);
-
 
     if (dateSelected < todayWithoutTime) {
         dateSelected = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 7);
@@ -210,11 +209,14 @@ const PatientInfo = ({
 
     const fetchPatients = async () => {
         setLoading(true)
+
         try {
+            console.log(date, slot)
             const response = await fetch(`/api/doctor/schedule/patients`, {
                 method: "POST",
                 body: JSON.stringify({
-                    date: new Date().toISOString(), // 假設你要查詢今天的病患名單
+                    date: dateSelected, // 假設你要查詢今天的病患名單
+                    slot: slot
                 })
             });
 
