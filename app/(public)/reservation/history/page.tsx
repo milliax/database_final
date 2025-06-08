@@ -10,6 +10,8 @@ type Reservation = {
     date: string;
     detail: string;
     commented?: boolean;
+
+    slot: number; // 0: 早上, 1: 中午, 2: 晚上
 };
 
 const today = new Date().toISOString().split("T")[0];
@@ -33,6 +35,7 @@ export default function ReservationHistoryPage() {
                 setReservations(
                     data.reservations.sort((a: Reservation, b: Reservation) => b.date.localeCompare(a.date))
                 );
+                console.log("reservations", data.reservations);
                 if (data.userName) setUserName(data.userName);
                 setLoading(false);
             });
@@ -123,7 +126,7 @@ export default function ReservationHistoryPage() {
                                     </div>
                                     <div>
                                         <span className="font-semibold">看診日期：</span>
-                                        {r.date}
+                                        {`${r.date} ${r.slot === 0 ? "早上" : r.slot === 1 ? "中午" : "晚上"}`}
                                     </div>
                                 </div>
                                 <button

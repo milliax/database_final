@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 
@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
 
 import { z } from 'zod';
+import { addHours } from 'date-fns';
 
 export const POST = async (req: NextRequest) => {
     const session = await getServerSession(authOptions);
@@ -28,7 +29,9 @@ export const POST = async (req: NextRequest) => {
             return new Response(JSON.stringify({ error: "Invalid request body" }), { status: 400 });
         }
 
-        const { doctor_id, date, time } = parsedBody.data;
+        const { doctor_id, time } = parsedBody.data;
+
+        const date = addHours(parsedBody.data.date, 8)
 
         console.log(doctor_id, date, time);
 
@@ -94,9 +97,41 @@ export const POST = async (req: NextRequest) => {
             dateObj.getDate(),
         ))
 
+        console.log("normalizedDay: ", normalizedDay)
+
         await prisma.$transaction(async (tx) => {
 
             // fetch consulting room, checking the the limit exceed
+
+            // check if the customer has already reserved this time slot
+
+            const user = await tx.user.findUnique({
+                where: {
+                    email: session.user.email || "",
+                },
+                include: {
+                    patient: true,
+                }
+            });
+
+            const pastReservation = await tx.consultation.findFirst({
+                where: {
+                    patient: {
+                        id: user?.patient?.id || "",
+                    },
+                    ConsultingRoom: {
+                        doctorId: doctor_id,
+                        day: normalizedDay,
+                        slot: time,
+                    }
+                }
+            })
+
+            console.log("pastReservation: ", pastReservation)
+
+            if (pastReservation) {
+                throw new Error("You have already reserved this time slot");
+            }
 
             const existingReservation = await tx.consultingRoom.findFirst({
                 where: {
@@ -115,22 +150,13 @@ export const POST = async (req: NextRequest) => {
             });
 
             if (existingReservation && existingReservation._count.consultations >= existingReservation.max_consultation_number) {
-                return new Response(JSON.stringify({ error: "This time slot is fully booked" }), { status: 400 });
+                throw new Error("This time slot is fully booked");
             }
 
             console.log(session.user)
 
             console.log(doctor.id)
             console.log(normalizedDay, time)
-
-            const user = await tx.user.findUnique({
-                where: {
-                    email: session.user.email || "",
-                },
-                include: {
-                    patient: true,
-                }
-            });
 
             const reservation = await tx.consultation.create({
                 data: {
@@ -165,6 +191,33 @@ export const POST = async (req: NextRequest) => {
 
         return new Response(JSON.stringify({ message: "Reservation created successfully" }), { status: 201 });
     } catch (error) {
+        // handle prisma thrown errors
+
+        // if error has key message
+
+        const e: any = error
+
+        if (e.message) {
+            if (e.message.includes("This time slot is fully booked")) {
+                return NextResponse.json(
+                    { error: "此時段已滿，請選擇其他時段" },
+                    { status: 400 }
+                );
+            } else if (e.message.includes("You have already reserved this time slot")) {
+                return NextResponse.json(
+                    { error: "此時段已預約，請選擇其他時段" },
+                    { status: 400 }
+                );
+            }
+        }
+
+
+        // if(error && error.message){
+        //     if(error.message.includes("You have already reserved this time slot")) {
+        //         return new Response(JSON.stringify({ error: "You have already reserved this time slot" }), { status: 400 });
+        //     }
+        // }
+
         console.error("Error in reservation route:", error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
     }

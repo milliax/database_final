@@ -19,6 +19,7 @@ export default function DoctorReservePage({
     doctor_id: string;
 }) {
     const today = new Date();
+    const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 
     const [reserve, setReserve] = useState<boolean>(false);
 
@@ -115,6 +116,10 @@ export default function DoctorReservePage({
     }, [])
 
     const reserveNow = async () => {
+        if (submitLoading) return
+
+        setSubmitLoading(true);
+
         const res = await fetch(`/api/reservation`, {
             method: "POST",
             body: JSON.stringify({
@@ -124,9 +129,10 @@ export default function DoctorReservePage({
             }),
         })
         const result = await res.json();
+        setSubmitLoading(false);
+
         if (!res.ok) {
             console.error("Failed to reserve");
-
             console.error(result);
 
             Swal.fire({
@@ -199,8 +205,11 @@ export default function DoctorReservePage({
             </div>
 
             <div>
-                <button className="bg-blue-500 w-20 h-12 text-white rounded-md hover:bg-blue-600 cursor-pointer" onClick={() => {
+                <button className={clsx("bg-blue-500 w-20 h-12 text-white rounded-md hover:bg-blue-600 cursor-pointer",
+                    submitLoading ? "opacity-50 cursor-not-allowed" : "",
+                )} onClick={() => {
                     reserveNow()
+
                 }}> 預約 </button>
             </div>
         </div>
