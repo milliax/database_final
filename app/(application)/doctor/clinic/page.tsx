@@ -85,6 +85,7 @@ export default function DoctorClinicPage() {
                     </React.Fragment>
                 )}
             </div>
+            
         </div>
     );
 }
