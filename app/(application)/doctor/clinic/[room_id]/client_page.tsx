@@ -268,7 +268,7 @@ export default function DoctorClinicPage({
                     </div>
                 </div>
                 {/* 下方：當前病患資訊 */}
-                {currentNumber !== 0 && (
+                {currentNumber !== 0 && currentNumber < queue.length && (
                     <div className="mt-8">
                         <div className="text-lg font-semibold text-gray-700 mb-2">當前病患：{queue[currentNumber - 1].patient.user.name}</div>
                         <div className="mb-4">
