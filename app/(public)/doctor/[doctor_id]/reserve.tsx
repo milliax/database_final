@@ -75,11 +75,18 @@ export default function DoctorReservePage({
 
         for (let i = 0; i < s.length; i++) {
             if (s[i]) {
-                availableDays[i] = 1;
+                availableDays[i % 7] = 1;
             }
         }
-        // 右移availableDays
 
+        let temp = availableDays[6]
+        for (let i = 6; i > 0; i--) {
+            availableDays[i] = availableDays[i - 1];
+        }
+        availableDays[0] = temp; // 右移availableDays
+
+        // 右移availableDays
+        console.log("Available Days: ", availableDays);
 
         // get the first day of the month
         const firstDay = new Date(selectedYear, selectedMonth - 1, 1);
@@ -90,7 +97,7 @@ export default function DoctorReservePage({
         // Create an array to hold the days with events
         let daysWithEvents: number[] = [];
         for (let i = 1; i <= daysInMonth; i++) {
-            const dayOfWeek = (firstDayOfWeek + i - 2) % 7; // Calculate the day of the week for the current day
+            const dayOfWeek = (firstDayOfWeek + i - 1) % 7; // Calculate the day of the week for the current day
             if (availableDays[dayOfWeek] === 1) {
                 daysWithEvents.push(i);
             }

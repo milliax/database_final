@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
+
+import { useSession } from "next-auth/react";
 
 export default function DoctorSummaryPage({
     doctors,
@@ -24,6 +25,8 @@ export default function DoctorSummaryPage({
 }) {
     const pathname = usePathname()
     const selected_department = pathname.split("/").pop() || "";
+
+    const { data: session } = useSession();
 
     // console.log(doctors)
 
@@ -120,12 +123,22 @@ export default function DoctorSummaryPage({
                                             );
                                         })}
                                         <div className="mt-4 flex justify-end">
-                                            <Link
-                                                href={`/doctor/${d.id}`}
-                                                className="text-xl px-6 py-2 rounded-full bg-yellow-400 text-black hover:bg-green-800 hover:text-white transition hover:scale-110 duration-75"
-                                            >
-                                                我要預約
-                                            </Link>
+                                            {/* if not logged in redirect to login */}
+                                            {!session ? (
+                                                <Link
+                                                    href={`/login?redirect=${encodeURIComponent(`/doctor/${d.id}`)}`}
+                                                    className="text-xl px-6 py-2 rounded-full bg-yellow-400 text-black hover:bg-green-800 hover:text-white transition hover:scale-110 duration-75"
+                                                >
+                                                    我要預約
+                                                </Link>
+                                            ) :
+                                                <Link
+                                                    href={`/doctor/${d.id}`}
+                                                    className="text-xl px-6 py-2 rounded-full bg-yellow-400 text-black hover:bg-green-800 hover:text-white transition hover:scale-110 duration-75"
+                                                >
+                                                    我要預約
+                                                </Link>
+                                            }
                                         </div>
                                         {/* TODO: datetime error hydration */}
                                         <div className="mt-2 text-sm text-gray-500">資料更新日期: {new Date(d.updatedAt).toLocaleDateString()}</div>
