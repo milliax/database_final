@@ -339,29 +339,30 @@ const PatientInfo = ({
                             ) : history.length === 0 ? (
                                 <div className="text-gray-500 py-8">無歷史紀錄</div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full border border-gray-300 rounded-lg text-sm">
-                                        <thead className="bg-gray-100">
-                                            <tr>
-                                                <th className="px-2 py-1 border-b">日期</th>
-                                                <th className="px-2 py-1 border-b">描述</th>
-                                                <th className="px-2 py-1 border-b">處方</th>
-                                                <th className="px-2 py-1 border-b">評分</th>
-                                                <th className="px-2 py-1 border-b">評論</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {history.map((item, idx) => (
-                                                <tr key={idx} className="hover:bg-green-50">
-                                                    <td className="px-2 py-1 border-b">{new Date(item.createdAt).toLocaleDateString()}</td>
-                                                    <td className="px-2 py-1 border-b">{item.description || "無"}</td>
-                                                    <td className="px-2 py-1 border-b">{item.prescription || "無"}</td>
-                                                    <td className="px-2 py-1 border-b">{item.rating ?? "無"}</td>
-                                                    <td className="px-2 py-1 border-b">{item.comment ?? "無"}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                <div className="space-y-4 max-h-96 overflow-y-auto">
+                                    {history.map((item, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="border rounded-lg p-4 bg-gray-50 shadow-sm"
+                                        >
+                                            <div className="flex flex-wrap gap-4 mb-2 text-sm text-gray-600">
+                                                <span><b>日期：</b>{new Date(item.createdAt).toLocaleDateString()}</span>
+                                                <span><b>評分：</b>{item.rating ?? "無"}</span>
+                                            </div>
+                                            <div className="mb-2">
+                                                <b>描述：</b>
+                                                <div className="whitespace-pre-line break-words text-gray-800">{item.description || "無"}</div>
+                                            </div>
+                                            <div className="mb-2">
+                                                <b>處方：</b>
+                                                <div className="whitespace-pre-line break-words text-gray-800">{item.prescription || "無"}</div>
+                                            </div>
+                                            <div>
+                                                <b>評論：</b>
+                                                <div className="whitespace-pre-line break-words text-gray-800">{item.comment ?? "無"}</div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </motion.div>

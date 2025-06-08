@@ -55,24 +55,46 @@ export default function DepartmentPage({
                 transition={{ duration: 1.2, type: "spring" }}
             >
                 <h1 className="text-2xl font-bold mb-6">{department_name} 班表</h1>
-                <div className="grid grid-cols-8 gap-5 divide-y divide-gray-600">
-                    <div />
-                    {Array.from({ length: 7 }).map((_, rowIdx) => (
-                        <div key={rowIdx} className="text-center font-semibold">
-                            {numberInLetter(rowIdx)}
-                        </div>
-                    ))}
+                {/* 新增：本週日期列 */}
+                
+                <div className="grid grid-cols-8 gap-0 divide-y divide-gray-600">
+                    <div /> 
+                    {Array.from({ length: 7 }).map((_, colIdx) => {
+                        const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
+                        const today = new Date();
+                        const startDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+                        const day = new Date(startDayOfWeek.getFullYear(), startDayOfWeek.getMonth(), startDayOfWeek.getDate() + colIdx);
+                        return (
+                            <div
+                                key={colIdx}
+                                className="flex flex-col items-center justify-center" // <-- 移除 border-r
+                            >
+                                <div className="w-36 border border-gray-400 bg-blue-200 py-1 flex flex-col items-center rounded-xl">
+                                    <span className="font-semibold">{weekDays[colIdx]}</span>
+                                    <span className="text-black text-sm">{day.getMonth() + 1}/{day.getDate()}</span>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    {/* 區隔線，去掉 my-1，讓線直接貼合上下框 */}
+                    <div className="col-span-8 border-b-4 border-gray-600" />
 
                     {schedules.map((slot, index) => {
                         if (index % 7 === 0) {
+                            // 左側時段欄位加框
+                            let timeLabel = "";
+                            if (index === 0) timeLabel = "7:00-11:00";
+                            if (index === 7) timeLabel = "13:00-17:00";
+                            if (index === 14) timeLabel = "18:00-22:00";
                             return (
                                 <React.Fragment key={index}>
-                                    <div >
-                                        {index === 0 && "7:00-11:00"}
-                                        {index === 7 && "13:00-17:00"}
-                                        {index === 14 && "18:00-22:00"}
+                                    <div>
+                                        <div className="w-36 border border-gray-400 bg-blue-100 py-8 flex flex-col items-center justify-center rounded-xl font-semibold border-b-4 border-gray-600">
+                                            {timeLabel}
+                                        </div>
                                     </div>
-                                    <div key={index} className="text-center font-semibold flex flex-col gap-1">
+                                    <div className="text-center font-semibold flex flex-col gap-1 border-b-4 border-gray-600 bg-WHITE border-l border-gray-400 border-r border-gray-400">
                                         {slot.map((doctor, colIdx) => (
                                             <div key={doctor}>
                                                 {doctor}
@@ -84,7 +106,7 @@ export default function DepartmentPage({
                         }
 
                         return (
-                            <div key={index} className="text-center font-semibold flex flex-col gap-1">
+                            <div key={index} className="text-center font-semibold flex flex-col gap-1 border-b-4 border-gray-600 bg-WHITE border-r border-gray-400">
                                 {slot.map((doctor, colIdx) => (
                                     <div key={doctor}>
                                         {doctor}
