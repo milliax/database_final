@@ -53,7 +53,7 @@ export default function Navigation() {
                         onMouseLeave={handleMouseLeave}
                     >
                         <button className="text-slate-900 hover:text-slate-600 text-lg">
-                            我要預約
+                            鄭弘煒超帥
                         </button>
                         {open && (
                             <div className="absolute left-0 mt-2 w-32 bg-white border rounded shadow z-10">
@@ -61,13 +61,13 @@ export default function Navigation() {
                                     href="/doctors"
                                     className="block px-4 py-2 text-slate-900 hover:bg-slate-100"
                                 >
-                                    預約
+                                    I love Wei Cheng
                                 </Link>
                                 <Link
                                     href="/reservation/history"
                                     className="block px-4 py-2 text-slate-900 hover:bg-slate-100"
                                 >
-                                    預約紀錄
+                                    Weeeeeee
                                 </Link>
                             </div>
                         )}
