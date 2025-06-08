@@ -11,6 +11,7 @@ export default function DoctorClinicPage() {
     const [queue, setQueue] = useState<any[]>([]);
     const [patientStatus, setPatientStatus] = useState<{ [id: string]: string }>({});
     const [confirm, setConfirm] = useState(false);
+    const [showEndConfirm, setShowEndConfirm] = useState(false);
 
     const router = useRouter();
 
@@ -55,6 +56,13 @@ export default function DoctorClinicPage() {
     const handleStatus = (id: string, status: string) => {
         setPatientStatus(prev => ({ ...prev, [id]: status }));
         // 這裡可加呼叫後端 API 更新狀態
+    };
+
+    // 結束看診
+    const endClinic = async () => {
+        // 呼叫 API 將所有未報到的病人標記為未到
+        await fetch("/api/clinic/end", { method: "POST" });
+        router.push("/doctor");
     };
 
     // 新增：進入頁面先詢問是否開始看診
@@ -115,7 +123,7 @@ export default function DoctorClinicPage() {
     if (loading) return <div className="text-center mt-10">載入中...</div>;
 
     return (
-        <div className="min-h-screen bg-green-50 flex flex-col items-center py-10">
+        <div className="min-h-screen bg-green-50 flex flex-col items-center py-10 relative">
             <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-4xl">
                 {/* 上方：目前號碼 + 候診名單 */}
                 <div className="flex justify-between items-start mb-10">
@@ -160,15 +168,6 @@ export default function DoctorClinicPage() {
                                             >
                                                 看診
                                             </button>
-                                            <button
-                                                className={`px-3 py-1 rounded text-sm transition 
-                                                    ${patientStatus[p.id] === "absent"
-                                                        ? "bg-gray-600 text-white"
-                                                        : "bg-gray-400 text-white hover:bg-gray-500"}`}
-                                                onClick={() => handleStatus(p.id, "absent")}
-                                            >
-                                                未到
-                                            </button>
                                         </div>
                                     </li>
                                 ))
@@ -207,6 +206,41 @@ export default function DoctorClinicPage() {
                     </div>
                 )}
             </div>
+            {/* 右下角結束看診按鈕 */}
+            <button
+                className="fixed bottom-10 right-10 bg-red-600 text-white px-8 py-3 rounded-xl text-xl font-bold shadow hover:bg-red-700 transition active:scale-95 z-50"
+                onClick={() => setShowEndConfirm(true)}
+            >
+                結束看診
+            </button>
+            {/* 結束看診確認框 */}
+            {showEndConfirm && (
+                <div
+                    className="fixed inset-0 flex items-center justify-center z-50"
+                    style={{ background: "rgba(0,0,0,0.5)" }}
+                >
+                    <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-6 min-w-[320px]">
+                        <h2 className="text-xl font-bold mb-2">確定要結束看診嗎？</h2>
+                        <div className="text-gray-700 text-lg mb-4">
+                            所有未報到的病人將自動標記為未到
+                        </div>
+                        <div className="flex gap-6 mt-4">
+                            <button
+                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                                onClick={endClinic}
+                            >
+                                是
+                            </button>
+                            <button
+                                className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
+                                onClick={() => setShowEndConfirm(false)}
+                            >
+                                否
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
