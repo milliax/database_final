@@ -9,9 +9,22 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 
 import { redirect } from "next/navigation"
 
-export default async function LoginPage() {
-
+export default async function LoginPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ [key: string]: string }>
+}) {
     const session = await getServerSession(authOptions);
+
+    const params = await searchParams;
+
+    if (params?.redirect) {
+        if (session) {
+            if (params.redirect.startsWith("/")) {
+                redirect(`${params.redirect}`); // already logged in, redirect to home
+            }
+        }
+    }
 
     if (session) {
         // logged in
@@ -26,9 +39,9 @@ export default async function LoginPage() {
                 case "ADMIN":
                     redirect("/admin")
                     break;
-                case "PATIENT":
-                    redirect("/summary")
-                    break;
+                // case "PATIENT":
+                //     redirect("/")
+                //     break;
                 case "DOCTOR":
                     redirect("/doctor")
                     break;

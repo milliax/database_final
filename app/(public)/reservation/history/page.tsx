@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { LoadingCircle } from "@/components/loading";
 
 type Reservation = {
     id: string;
@@ -23,6 +24,8 @@ export default function ReservationHistoryPage() {
     const [rating, setRating] = useState(5);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         fetch("/api/reservation/history")
             .then(res => res.json())
@@ -31,6 +34,7 @@ export default function ReservationHistoryPage() {
                     data.reservations.sort((a: Reservation, b: Reservation) => b.date.localeCompare(a.date))
                 );
                 if (data.userName) setUserName(data.userName);
+                setLoading(false);
             });
     }, []);
 
@@ -81,14 +85,20 @@ export default function ReservationHistoryPage() {
             )}
             <div className="space-y-4">
                 {reservations.length === 0 ? (
-                    <motion.div
-                        className="text-3xl text-center text-gray-400 py-8"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.7, delay: 0.4 }}
-                    >
-                        沒有預約紀錄
-                    </motion.div>
+                    <React.Fragment>
+                        {loading ? (
+                            <LoadingCircle />
+                        ) : (
+                            <motion.div
+                                className="text-3xl text-center text-gray-400 py-8"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.7, delay: 0.4 }}
+                            >
+                                沒有預約紀錄
+                            </motion.div>
+                        )}
+                    </React.Fragment>
                 ) : (
                     reservations.map((r, idx) => {
                         const isFuture = r.date > today;
@@ -219,6 +229,6 @@ export default function ReservationHistoryPage() {
                     })
                 )}
             </div>
-        </div>
+        </div >
     );
 }
