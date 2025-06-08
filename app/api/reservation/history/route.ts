@@ -72,6 +72,7 @@ export async function GET() {
                     commented: (c.Feedback && c.Feedback.length > 0) ? true : false,
                     slot: c.ConsultingRoom?.slot || 0,
                     appointmentStatus: c.appointmentStatus || "", // 若有需要
+                    feedback: c.Feedback && c.Feedback.length > 0 ? c.Feedback[0] : null, // 取得最新的 feedback
                 }));
 
         return NextResponse.json({ userName, reservations });

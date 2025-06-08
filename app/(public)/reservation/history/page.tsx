@@ -16,6 +16,11 @@ type Reservation = {
     commentRating?: number; // 新增
     slot: number;
     appointmentStatus?: string;
+
+    feedback?: {
+        comment: string;
+        rating: number;
+    } | null; // 新增
 };
 
 const today = new Date().toISOString().split("T")[0];
@@ -29,6 +34,7 @@ export default function ReservationHistoryPage() {
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState(5);
     const [commentError, setCommentError] = useState<string | null>(null);
+    const [commentErrorIdx, setCommentErrorIdx] = useState<number | null>(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -40,10 +46,18 @@ export default function ReservationHistoryPage() {
         fetch("/api/reservation/history")
             .then(res => res.json())
             .then(data => {
-                setReservations(
-                    data.reservations.sort((a: Reservation, b: Reservation) => a.date.localeCompare(b.date))
+                // 先分組
+                const notCompleted = data.reservations.filter(
+                    (r: Reservation) => r.appointmentStatus !== "COMPLETED"
                 );
-                console.log("reservations", data.reservations);
+                const completed = data.reservations.filter(
+                    (r: Reservation) => r.appointmentStatus === "COMPLETED"
+                );
+                // 未完成：日期升冪，已完成：日期降冪
+                notCompleted.sort((a: Reservation, b: Reservation) => a.date.localeCompare(b.date));
+                completed.sort((a: Reservation, b: Reservation) => b.date.localeCompare(a.date));
+                // 合併，未完成在上，已完成在下
+                setReservations([...notCompleted, ...completed]);
                 if (data.userName) setUserName(data.userName);
                 setLoading(false);
             });
@@ -96,10 +110,32 @@ export default function ReservationHistoryPage() {
             setReservations(reservations.map((r, i) =>
                 i === idx ? { ...r, commented: true, commentContent: comment, commentRating: rating } : r
             ));
+
+            const res = await fetch("/api/reservation/comment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: reservations[idx].id,
+                    commentContent: comment,
+                    commentRating: rating,
+                }),
+            });
+
+            if(!res.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "送出評論失敗",
+                    text: "請稍後再試或聯繫客服。",
+                });
+                return;
+            }
             setShowCommentIdx(null);
             setOpenIdx(null);
             // 不要清空 comment，這樣下次還能編輯
             setRating(5);
+            fetchReservations();
             Swal.fire({
                 icon: "success",
                 title: "評論已送出！",
@@ -147,12 +183,12 @@ export default function ReservationHistoryPage() {
                 ) : (
                     reservations.map((r, idx) => {
                         const isFuture = r.date > today;
-                        const isCompleted = r.date < today && r.appointmentStatus === "COMPLETED";
+                        const isCompleted = r.appointmentStatus === "COMPLETED";
                         return (
                             <motion.div
                                 key={r.id || idx}
                                 className={`rounded-xl shadow p-5 flex flex-col gap-2 border relative min-h-[140px] transition-all duration-300
-                                    ${isCompleted ? "bg-gray-100" : "bg-white"}`}
+                                    ${isCompleted ? "bg-gray-200 border-gray-400" : "bg-white border-gray-200"}`}
                                 initial={{ opacity: 0, y: 40 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, delay: 0.2 + idx * 0.08 }}
@@ -181,12 +217,15 @@ export default function ReservationHistoryPage() {
                                             if (showCommentIdx === idx) {
                                                 setShowCommentIdx(null);
                                                 setCommentError(null);
+                                                setCommentErrorIdx(null);
                                             } else if (r.appointmentStatus === "COMPLETED") {
                                                 setShowCommentIdx(idx);
                                                 setCommentError(null);
-                                                setComment(r.commentContent || ""); // 預設為上次內容
+                                                setCommentErrorIdx(null);
+                                                setComment(r.commentContent || "");
                                             } else {
                                                 setCommentError("尚未完成看診無法評論");
+                                                setCommentErrorIdx(idx);
                                                 setShowCommentIdx(null);
                                             }
                                         }}
@@ -234,7 +273,7 @@ export default function ReservationHistoryPage() {
                                 )}
 
                                 {/* 評論錯誤訊息 */}
-                                {commentError && showCommentIdx === null && (
+                                {commentError && commentErrorIdx === idx && (
                                     <div className="text-red-600 font-semibold mb-2">{commentError}</div>
                                 )}
 
@@ -281,13 +320,13 @@ export default function ReservationHistoryPage() {
                                 {r.commented && (
                                     <div className="mt-4 bg-white border border-gray-300 rounded shadow-lg p-4 min-w-[220px]">
                                         <div className="mb-2 font-bold text-lg">我的評論</div>
-                                        <div className="mb-2 whitespace-pre-line">{r.commentContent}</div>
+                                        <div className="mb-2 whitespace-pre-line">{r?.feedback?.comment ?? ""}</div>
                                         <div>
                                             <span className="font-semibold mr-2">滿意度：</span>
                                             {[1, 2, 3, 4, 5].map(star => (
                                                 <span
                                                     key={star}
-                                                    className={`text-2xl ${star <= (r.commentRating || 0) ? "text-yellow-400" : "text-gray-300"}`}
+                                                    className={`text-2xl ${star <= (r.feedback?.rating || 0) ? "text-yellow-400" : "text-gray-300"}`}
                                                 >★</span>
                                             ))}
                                         </div>
