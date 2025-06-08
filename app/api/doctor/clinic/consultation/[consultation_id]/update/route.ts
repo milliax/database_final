@@ -42,6 +42,7 @@ export const POST = async (req: NextRequest, {
                 id: consultationId
             }, data: {
                 consultingStatus: "COMPLETED",
+                appointmentStatus: "COMPLETED",
 
                 prescription,
                 description
