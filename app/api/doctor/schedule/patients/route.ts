@@ -22,18 +22,18 @@ export const POST = async (req: NextRequest) => {
         const res = await req.json()
         const p = postSchema.safeParse(res)
 
-        
         if (!p.success) {
             return new Response(JSON.stringify({ error: "無效的請求格式" }), { status: 400 })
         }
 
         const { slot } = p.data
 
-        const date = addHours(new Date(p.data.date), slot)
+        const date = addHours(new Date(p.data.date), 8)
+        // const date =new Date(p.data.date)
 
         console.log("date", date)
         console.log("slot", slot)
-        
+
         const doctor = await prisma.user.findUnique({
             where: {
                 email: session.user.email || ""
@@ -49,17 +49,19 @@ export const POST = async (req: NextRequest) => {
         // get consulting room
 
         console.log(date, slot)
+        const correctedSlot = slot < 7 ? 0 : (slot < 14 ? 1 : 2);
 
         const consultingRoom = await prisma.consultingRoom.findFirst({
             where: {
                 doctorId: doctor.doctor?.id,
-                day: date
+                day: date,
+                slot: correctedSlot
             },
             include: {
                 consultations: {
                     include: {
                         patient: {
-                            include:{
+                            include: {
                                 user: true,
                             },
                         }
